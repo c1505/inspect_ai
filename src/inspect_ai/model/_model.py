@@ -1026,6 +1026,22 @@ class Model:
             if output.usage:
                 record_and_check_model_usage(f"{self}", output.usage, role=self.role)
 
+                # check for thinking-model truncation
+                if (
+                    output.stop_reason == "max_tokens"
+                    and output.usage.reasoning_tokens
+                    and output.usage.reasoning_tokens > 0
+                ):
+                    record_thinking_truncation(f"{self}")
+                    warn_once(
+                        logger,
+                        f"Thinking-model truncation detected: {self} hit "
+                        f"max_tokens with reasoning tokens present. "
+                        f"Visible output may be severely truncated. "
+                        f"Consider increasing max_tokens or setting "
+                        f"reasoning_tokens to cap the thinking budget.",
+                    )
+
                 # send telemetry to hooks
                 await emit_model_usage(
                     model_name=str(self), usage=output.usage, call_duration=output.time
@@ -1912,6 +1928,40 @@ def init_model_usage(initial_usage: dict[str, ModelUsage] | None = None) -> None
 
 def init_sample_model_usage() -> None:
     sample_model_usage_context_var.set({})
+    sample_thinking_truncation_var.set(False)
+
+
+def record_thinking_truncation(model: str) -> None:
+    """Record that a thinking-model truncation occurred for the current sample."""
+    if not sample_thinking_truncation_var.get(False):
+        # only count once per sample for eval-wide summary
+        counts = thinking_truncation_counts_var.get({})
+        counts[model] = counts.get(model, 0) + 1
+        thinking_truncation_counts_var.set(counts)
+    sample_thinking_truncation_var.set(True)
+
+
+def sample_thinking_truncated() -> bool:
+    """Check if the current sample had any thinking-model truncation."""
+    return sample_thinking_truncation_var.get(False)
+
+
+def thinking_truncation_counts() -> dict[str, int]:
+    """Get per-model counts of thinking-model truncations across the eval."""
+    return thinking_truncation_counts_var.get({})
+
+
+def init_thinking_truncation_counts() -> None:
+    thinking_truncation_counts_var.set({})
+
+
+sample_thinking_truncation_var: ContextVar[bool] = ContextVar(
+    "sample_thinking_truncation", default=False
+)
+
+thinking_truncation_counts_var: ContextVar[dict[str, int]] = ContextVar(
+    "thinking_truncation_counts", default={}
+)
 
 
 def init_role_usage(initial_usage: dict[str, ModelUsage] | None = None) -> None:

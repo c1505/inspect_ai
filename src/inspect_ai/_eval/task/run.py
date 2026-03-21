@@ -91,6 +91,9 @@ from inspect_ai.model._model import (
     init_sample_role_usage,
     sample_model_usage,
     sample_role_usage,
+    sample_thinking_truncated,
+    thinking_truncation_counts,
+    init_thinking_truncation_counts,
 )
 from inspect_ai.scorer import Scorer, Target
 from inspect_ai.scorer._metric import Metric, SampleScore
@@ -519,6 +522,21 @@ async def task_run(options: TaskRunOptions) -> EvalLog:
 
             # collect eval data
             collect_eval_data(stats)
+
+            # warn about thinking-model truncation
+            trunc_counts = thinking_truncation_counts()
+            if trunc_counts:
+                total_samples = profile.samples
+                for model_name, count in trunc_counts.items():
+                    pct = 100 * count / total_samples if total_samples else 0
+                    py_logger.warning(
+                        f"Thinking-model truncation summary: {model_name}: "
+                        f"{count}/{total_samples} samples ({pct:.0f}%) hit "
+                        f"max_tokens with reasoning tokens present. Results "
+                        f"may be unreliable. Consider increasing max_tokens "
+                        f"or setting reasoning_tokens to cap the thinking "
+                        f"budget."
+                    )
 
             sample_error_count = sum(result is None for result in sample_results)
             mark_log_as_error = _should_eval_fail(
@@ -1284,13 +1302,18 @@ def create_eval_sample(
     # compute total time if we can
     total_time = time.monotonic() - start_time if start_time is not None else None
 
+    # add thinking-truncation flag to metadata if detected
+    metadata = dict(state.metadata) if state.metadata else {}
+    if sample_thinking_truncated():
+        metadata["thinking_truncated"] = True
+
     return EvalSample(
         id=id,
         epoch=state.epoch,
         input=sample.input,
         choices=sample.choices,
         target=sample.target,
-        metadata=state.metadata or {},
+        metadata=metadata,
         sandbox=sample.sandbox,
         files=list(sample.files.keys()) if sample.files else None,
         setup=sample.setup,

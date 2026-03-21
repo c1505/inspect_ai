@@ -14,6 +14,7 @@ from inspect_ai.model._model import (
     init_model_roles,
     init_model_usage,
     init_role_usage,
+    init_thinking_truncation_counts,
 )
 from inspect_ai.util._concurrency import init_concurrency
 from inspect_ai.util._subprocess import init_max_subprocesses
@@ -51,6 +52,7 @@ def init_model_context(
     init_model_roles(model_roles or {})
     init_model_usage()
     init_role_usage()
+    init_thinking_truncation_counts()
 
 
 def init_task_context(
