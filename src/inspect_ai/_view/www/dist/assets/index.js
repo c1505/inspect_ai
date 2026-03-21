@@ -16314,7 +16314,7 @@ function createHashHistory(options2 = {}) {
     return href + "#" + (typeof to2 === "string" ? to2 : createPath(to2));
   }
   function validateHashLocation(location2, to2) {
-    warning(
+    warning$1(
       location2.pathname.charAt(0) === "/",
       `relative pathnames are not supported in hash history.push(${JSON.stringify(
         to2
@@ -16333,7 +16333,7 @@ function invariant(value2, message2) {
     throw new Error(message2);
   }
 }
-function warning(cond, message2) {
+function warning$1(cond, message2) {
   if (!cond) {
     if (typeof console !== "undefined") console.warn(message2);
     try {
@@ -16870,7 +16870,7 @@ function matchPath(pattern, pathname) {
   };
 }
 function compilePath(path, caseSensitive = false, end2 = true) {
-  warning(
+  warning$1(
     path === "*" || !path.endsWith("*") || path.endsWith("/*"),
     `Route path "${path}" will be treated as if it were "${path.replace(/\*$/, "/*")}" because the \`*\` character must always follow a \`/\` in the pattern. To get rid of this warning, please change the route path to "${path.replace(/\*$/, "/*")}".`
   );
@@ -16897,7 +16897,7 @@ function decodePath(value2) {
   try {
     return value2.split("/").map((v) => decodeURIComponent(v).replace(/\//g, "%2F")).join("/");
   } catch (error2) {
-    warning(
+    warning$1(
       false,
       `The URL path "${value2}" could not be decoded because it is a malformed URL segment. This is probably due to a bad percent encoding (${error2}).`
     );
@@ -17065,7 +17065,7 @@ function parseToInfo(_to, basename2) {
         isExternal = true;
       }
     } catch (e) {
-      warning(
+      warning$1(
         false,
         `<Link to="${to2}"> contains an invalid URL which will probably break when clicked - please update to a valid URL path.`
       );
@@ -17511,7 +17511,7 @@ function createRouter(init2) {
           unblockBlockerHistoryUpdate = void 0;
           return;
         }
-        warning(
+        warning$1(
           blockerFunctions.size === 0 || delta2 != null,
           "You are trying to use a blocker on a POP navigation to a location that was not created by @remix-run/router. This will fail silently in production. This can happen if you are navigating outside the router via `window.history.pushState`/`window.location.hash` instead of using router navigation APIs.  This can also happen if you are using createHashRouter and the user manually changes the URL."
         );
@@ -18978,7 +18978,7 @@ function createRouter(init2) {
       return;
     }
     if (blockerFunctions.size > 1) {
-      warning(false, "A router only supports one blocker at a time");
+      warning$1(false, "A router only supports one blocker at a time");
     }
     let entries = Array.from(blockerFunctions.entries());
     let [blockerKey, blockerFunction] = entries[entries.length - 1];
@@ -19697,13 +19697,13 @@ var loadLazyRouteProperty = ({
     let staticRouteValue = routeToUpdate[key2];
     let isStaticallyDefined = staticRouteValue !== void 0 && key2 !== "hasErrorBoundary";
     if (isUnsupported) {
-      warning(
+      warning$1(
         !isUnsupported,
         "Route property " + key2 + " is not a supported lazy route property. This property will be ignored."
       );
       cache[key2] = Promise.resolve();
     } else if (isStaticallyDefined) {
-      warning(
+      warning$1(
         false,
         `Route "${routeToUpdate.id}" has a static property "${key2}" defined. The lazy property will be ignored.`
       );
@@ -19760,12 +19760,12 @@ function loadLazyRoute(route, type, manifest, mapRouteProperties2, lazyRouteProp
         // on the route updates
         lazyRouteProperty !== "hasErrorBoundary";
         if (isUnsupported) {
-          warning(
+          warning$1(
             !isUnsupported,
             "Route property " + lazyRouteProperty + " is not a supported property to be returned from a lazy route function. This property will be ignored."
           );
         } else if (isStaticallyDefined) {
-          warning(
+          warning$1(
             !isStaticallyDefined,
             `Route "${routeToUpdate.id}" has a static property "${lazyRouteProperty}" defined but its lazy function is also returning a value for this property. The lazy route property "${lazyRouteProperty}" will be ignored.`
           );
@@ -20762,7 +20762,7 @@ function persistAppliedTransitions(_window, transitions) {
         JSON.stringify(json)
       );
     } catch (error2) {
-      warning(
+      warning$1(
         false,
         `Failed to save applied view transitions in sessionStorage (${error2}).`
       );
@@ -20917,7 +20917,7 @@ function useNavigateUnstable() {
   });
   let navigate = reactExports.useCallback(
     (to2, options2 = {}) => {
-      warning(activeRef.current, navigateEffectWarning);
+      warning$1(activeRef.current, navigateEffectWarning);
       if (!activeRef.current) return;
       if (typeof to2 === "number") {
         navigator2.go(to2);
@@ -21013,11 +21013,11 @@ Please change the parent <Route path="${parentPath}"> to <Route path="${parentPa
   }
   let matches = matchRoutes(routes, { pathname: remainingPathname });
   {
-    warning(
+    warning$1(
       parentRoute || matches != null,
       `No routes matched location "${location2.pathname}${location2.search}${location2.hash}" `
     );
-    warning(
+    warning$1(
       matches == null || matches[matches.length - 1].route.element !== void 0 || matches[matches.length - 1].route.Component !== void 0 || matches[matches.length - 1].route.lazy !== void 0,
       `Matched leaf route at location "${location2.pathname}${location2.search}${location2.hash}" does not have an element or Component. This means it will render an <Outlet /> with a null value by default resulting in an "empty" page.`
     );
@@ -21363,7 +21363,7 @@ function useNavigateStable() {
   });
   let navigate = reactExports.useCallback(
     async (to2, options2 = {}) => {
-      warning(activeRef.current, navigateEffectWarning);
+      warning$1(activeRef.current, navigateEffectWarning);
       if (!activeRef.current) return;
       if (typeof to2 === "number") {
         await router.navigate(to2);
@@ -21379,7 +21379,7 @@ var alreadyWarned = {};
 function warningOnce(key2, cond, message2) {
   if (!cond && !alreadyWarned[key2]) {
     alreadyWarned[key2] = true;
-    warning(false, message2);
+    warning$1(false, message2);
   }
 }
 var alreadyWarned2 = {};
@@ -21408,7 +21408,7 @@ function mapRouteProperties(route) {
   if (route.Component) {
     {
       if (route.element) {
-        warning(
+        warning$1(
           false,
           "You should not include both `Component` and `element` on your route - `Component` will be used."
         );
@@ -21422,7 +21422,7 @@ function mapRouteProperties(route) {
   if (route.HydrateFallback) {
     {
       if (route.hydrateFallbackElement) {
-        warning(
+        warning$1(
           false,
           "You should not include both `HydrateFallback` and `hydrateFallbackElement` on your route - `HydrateFallback` will be used."
         );
@@ -21436,7 +21436,7 @@ function mapRouteProperties(route) {
   if (route.ErrorBoundary) {
     {
       if (route.errorElement) {
-        warning(
+        warning$1(
           false,
           "You should not include both `ErrorBoundary` and `errorElement` on your route - `ErrorBoundary` will be used."
         );
@@ -21724,7 +21724,7 @@ function Navigate({
     `<Navigate> may be used only in the context of a <Router> component.`
   );
   let { static: isStatic } = reactExports.useContext(NavigationContext);
-  warning(
+  warning$1(
     !isStatic,
     `<Navigate> must not be used on the initial render in a <StaticRouter>. This is a no-op, but you should modify your code so the <Navigate> is only ever rendered in response to some user interaction or state change.`
   );
@@ -21796,7 +21796,7 @@ function Router({
       navigationType
     };
   }, [basename2, pathname, search, hash2, state, key2, navigationType]);
-  warning(
+  warning$1(
     locationContext != null,
     `<Router basename="${basename2}"> is not able to match the URL "${pathname}${search}${hash2}" because it does not start with the basename, so the <Router> won't render anything.`
   );
@@ -21873,7 +21873,7 @@ var supportedFormEncTypes = /* @__PURE__ */ new Set([
 ]);
 function getFormEncType(encType) {
   if (encType != null && !supportedFormEncTypes.has(encType)) {
-    warning(
+    warning$1(
       false,
       `"${encType}" is not a valid \`encType\` for \`<Form>\`/\`<fetcher.Form>\` and will default to "${defaultEncType}"`
     );
@@ -22645,7 +22645,7 @@ function useLinkClickHandler(to2, {
   );
 }
 function useSearchParams(defaultInit) {
-  warning(
+  warning$1(
     typeof URLSearchParams !== "undefined",
     `You cannot use the \`useSearchParams\` hook in a browser that does not support the URLSearchParams API. If you need to support Internet Explorer 11, we recommend you load a polyfill such as https://github.com/ungap/url-search-params.`
   );
@@ -118900,7 +118900,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.199-28-gc856926c2" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-4-g8f46d1457" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -119527,15 +119527,16 @@ const styles$18 = {
   folder,
   fullWidthHeight
 };
-const nameCell = "_nameCell_1jtud_1";
-const modelCell = "_modelCell_1jtud_8";
-const scoreCell = "_scoreCell_1jtud_15";
-const error$3 = "_error_1jtud_22";
-const started = "_started_1jtud_26";
-const success$1 = "_success_1jtud_30";
-const cancelled$1 = "_cancelled_1jtud_34";
-const statusCell$1 = "_statusCell_1jtud_38";
-const dateCell = "_dateCell_1jtud_45";
+const nameCell = "_nameCell_122l5_1";
+const modelCell = "_modelCell_122l5_8";
+const scoreCell = "_scoreCell_122l5_15";
+const error$3 = "_error_122l5_22";
+const started = "_started_122l5_26";
+const success$1 = "_success_122l5_30";
+const cancelled$1 = "_cancelled_122l5_34";
+const warning = "_warning_122l5_38";
+const statusCell$1 = "_statusCell_122l5_42";
+const dateCell = "_dateCell_122l5_49";
 const localStyles = {
   nameCell,
   modelCell,
@@ -119544,6 +119545,7 @@ const localStyles = {
   started,
   success: success$1,
   cancelled: cancelled$1,
+  warning,
   statusCell: statusCell$1,
   dateCell
 };
@@ -119693,7 +119695,16 @@ const useLogListColumns = () => {
           }
           const icon2 = item2.type === "pending-task" ? ApplicationIcons.pendingTask : status2 === "error" ? ApplicationIcons.error : status2 === "started" ? ApplicationIcons.running : status2 === "cancelled" ? ApplicationIcons.cancelled : ApplicationIcons.success;
           const clz = item2.type === "pending-task" ? styles$17.started : status2 === "error" ? styles$17.error : status2 === "started" ? styles$17.started : status2 === "cancelled" ? styles$17.cancelled : styles$17.success;
-          return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: styles$17.statusCell, children: /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: clsx(icon2, clz) }) });
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: styles$17.statusCell, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: clsx(icon2, clz) }),
+            item2.hasThinkingTruncation && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "i",
+              {
+                className: clsx(ApplicationIcons.warning, styles$17.warning),
+                title: "Thinking-model truncation detected"
+              }
+            )
+          ] });
         }
       },
       {
@@ -176864,6 +176875,11 @@ const LogListGrid = ({
           }
         }
       }
+      if (details?.sampleSummaries) {
+        row2.hasThinkingTruncation = details.sampleSummaries.some(
+          (s) => s.metadata?.thinking_truncated === true
+        );
+      }
       row2.searchText = [row2.name, row2.task, row2.model, row2.id].filter(Boolean).join(" ").toLowerCase();
       return row2;
     });
@@ -179430,16 +179446,18 @@ const ChatViewVirtualListComponent = reactExports.memo(
     );
   }
 );
-const tabPanel = "_tabPanel_20s9q_1";
-const tabControls = "_tabControls_20s9q_5";
-const fullWidth$1 = "_fullWidth_20s9q_12";
-const padded = "_padded_20s9q_25";
-const error$2 = "_error_20s9q_30";
-const ansi = "_ansi_20s9q_34";
-const noTop = "_noTop_20s9q_38";
-const chat = "_chat_20s9q_50";
-const transcriptContainer = "_transcriptContainer_20s9q_58";
-const overflowVisible$1 = "_overflowVisible_20s9q_62";
+const tabPanel = "_tabPanel_seell_1";
+const tabControls = "_tabControls_seell_5";
+const fullWidth$1 = "_fullWidth_seell_12";
+const padded = "_padded_seell_25";
+const error$2 = "_error_seell_30";
+const ansi = "_ansi_seell_34";
+const noTop = "_noTop_seell_38";
+const chat = "_chat_seell_50";
+const transcriptContainer = "_transcriptContainer_seell_58";
+const overflowVisible$1 = "_overflowVisible_seell_62";
+const truncationBanner = "_truncationBanner_seell_66";
+const truncationTitle = "_truncationTitle_seell_76";
 const styles$Z = {
   tabPanel,
   tabControls,
@@ -179450,7 +179468,9 @@ const styles$Z = {
   noTop,
   chat,
   transcriptContainer,
-  overflowVisible: overflowVisible$1
+  overflowVisible: overflowVisible$1,
+  truncationBanner,
+  truncationTitle
 };
 function truncateMarkdown(markdown, maxLength = 250, ellipsis2 = "...") {
   if (!markdown || markdown.length <= maxLength) {
@@ -193337,6 +193357,17 @@ const metadataViewsForSample = (id, scrollRef, sample2) => {
           }
         ) })
       ] }, `sample-invalidation-${id}`)
+    );
+  }
+  if (sample2.metadata?.thinking_truncated) {
+    sampleMetadatas.push(
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: styles$Z.truncationBanner, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: "bi bi-exclamation-triangle" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: styles$Z.truncationTitle, children: "Thinking-Model Truncation" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "This sample hit max_tokens with reasoning tokens present. Visible output may be severely truncated. Consider increasing max_tokens or setting reasoning_tokens." })
+        ] })
+      ] }) }) }, `sample-truncation-${id}`)
     );
   }
   if (sample2.model_usage && Object.keys(sample2.model_usage).length > 0) {
@@ -216093,6 +216124,17 @@ const SampleList = reactExports.memo((props) => {
       result2.push({
         type: "info",
         msg: `Skipped ${earlyStopping.early_stops.length} samples due to early stopping (${earlyStopping.manager}). `
+      });
+    }
+    const truncatedCount = items.reduce(
+      (prev, item2) => item2.data.metadata?.thinking_truncated ? prev + 1 : prev,
+      0
+    );
+    if (truncatedCount > 0) {
+      const percentTruncated = sampleCount > 0 ? truncatedCount / sampleCount * 100 : 0;
+      result2.push({
+        type: "warning",
+        msg: `WARNING: ${truncatedCount} of ${sampleCount} samples (${formatNoDecimal(percentTruncated)}%) had thinking-model truncation (reasoning tokens consumed max_tokens budget). Results may be unreliable.`
       });
     }
     return result2;

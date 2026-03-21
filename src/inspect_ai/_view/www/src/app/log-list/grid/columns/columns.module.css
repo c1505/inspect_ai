@@ -35,6 +35,10 @@
   color: var(--bs-secondary);
 }
 
+.warning {
+  color: var(--bs-warning);
+}
+
 .statusCell {
   display: flex;
   align-items: center;

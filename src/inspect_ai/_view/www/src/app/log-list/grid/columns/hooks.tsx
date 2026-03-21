@@ -223,6 +223,12 @@ export const useLogListColumns = (): {
           return (
             <div className={styles.statusCell}>
               <i className={clsx(icon, clz)} />
+              {item.hasThinkingTruncation && (
+                <i
+                  className={clsx(ApplicationIcons.warning, styles.warning)}
+                  title="Thinking-model truncation detected"
+                />
+              )}
             </div>
           );
         },

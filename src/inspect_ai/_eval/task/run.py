@@ -48,6 +48,7 @@ from inspect_ai._util.working import (
 from inspect_ai._view.notify import view_notify_eval
 from inspect_ai.dataset import Dataset, Sample
 from inspect_ai.event._error import ErrorEvent
+from inspect_ai.event._model import ModelEvent
 from inspect_ai.event._sample_init import SampleInitEvent
 from inspect_ai.event._sample_limit import SampleLimitEvent
 from inspect_ai.event._score import ScoreEvent
@@ -91,7 +92,6 @@ from inspect_ai.model._model import (
     init_sample_role_usage,
     sample_model_usage,
     sample_role_usage,
-    sample_thinking_truncated,
     thinking_truncation_counts,
     init_thinking_truncation_counts,
 )
@@ -922,6 +922,8 @@ async def task_run_sample(
                                     async with span("solvers"):
                                         state = await plan(state, generate)
 
+
+
                                 # some 'cancel' exceptions are actually user interrupts or the
                                 # result of monitor_working_limit() - for these exceptions we
                                 # want to intercept them and apply the appropriate control flow
@@ -1302,9 +1304,17 @@ def create_eval_sample(
     # compute total time if we can
     total_time = time.monotonic() - start_time if start_time is not None else None
 
-    # add thinking-truncation flag to metadata if detected
+    # derive thinking-truncation flag from transcript model events
+    # (avoids ContextVar propagation issues across async task boundaries)
     metadata = dict(state.metadata) if state.metadata else {}
-    if sample_thinking_truncated():
+    thinking_truncated = any(
+        isinstance(e, ModelEvent)
+        and e.output.stop_reason == "max_tokens"
+        and e.output.usage is not None
+        and (e.output.usage.reasoning_tokens or 0) > 0
+        for e in transcript().events
+    )
+    if thinking_truncated:
         metadata["thinking_truncated"] = True
 
     return EvalSample(

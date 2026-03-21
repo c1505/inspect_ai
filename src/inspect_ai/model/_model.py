@@ -1928,22 +1928,19 @@ def init_model_usage(initial_usage: dict[str, ModelUsage] | None = None) -> None
 
 def init_sample_model_usage() -> None:
     sample_model_usage_context_var.set({})
-    sample_thinking_truncation_var.set(False)
+    # mutable list so the flag survives async task boundaries
+    # (child task mutations to the list are visible to parent)
+    sample_thinking_truncation_var.set([False])
 
 
 def record_thinking_truncation(model: str) -> None:
     """Record that a thinking-model truncation occurred for the current sample."""
-    if not sample_thinking_truncation_var.get(False):
+    flag = sample_thinking_truncation_var.get([False])
+    if not flag[0]:
         # only count once per sample for eval-wide summary
         counts = thinking_truncation_counts_var.get({})
         counts[model] = counts.get(model, 0) + 1
-        thinking_truncation_counts_var.set(counts)
-    sample_thinking_truncation_var.set(True)
-
-
-def sample_thinking_truncated() -> bool:
-    """Check if the current sample had any thinking-model truncation."""
-    return sample_thinking_truncation_var.get(False)
+    flag[0] = True
 
 
 def thinking_truncation_counts() -> dict[str, int]:
@@ -1955,8 +1952,8 @@ def init_thinking_truncation_counts() -> None:
     thinking_truncation_counts_var.set({})
 
 
-sample_thinking_truncation_var: ContextVar[bool] = ContextVar(
-    "sample_thinking_truncation", default=False
+sample_thinking_truncation_var: ContextVar[list[bool]] = ContextVar(
+    "sample_thinking_truncation", default=[False]
 )
 
 thinking_truncation_counts_var: ContextVar[dict[str, int]] = ContextVar(
