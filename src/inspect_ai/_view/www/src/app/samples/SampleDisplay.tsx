@@ -584,6 +584,28 @@ const metadataViewsForSample = (
     );
   }
 
+  if (sample.metadata?.thinking_truncated) {
+    sampleMetadatas.push(
+      <Card key={`sample-truncation-${id}`}>
+        <CardBody>
+          <div className={styles.truncationBanner}>
+            <i className="bi bi-exclamation-triangle" />
+            <div>
+              <div className={styles.truncationTitle}>
+                Thinking-Model Truncation
+              </div>
+              <div>
+                This sample hit max_tokens with reasoning tokens present.
+                Visible output may be severely truncated. Consider increasing
+                max_tokens or setting reasoning_tokens.
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>,
+    );
+  }
+
   if (sample.model_usage && Object.keys(sample.model_usage).length > 0) {
     sampleMetadatas.push(
       <Card key={`sample-usage-${id}`}>

@@ -62,3 +62,18 @@
 .overflowVisible {
   overflow-y: visible;
 }
+
+.truncationBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75em;
+  padding: 0.75em 1em;
+  background-color: var(--bs-warning-bg-subtle, #fff3cd);
+  border-radius: 0.375em;
+  color: var(--bs-warning-text-emphasis, #664d03);
+}
+
+.truncationTitle {
+  font-weight: 600;
+  margin-bottom: 0.25em;
+}
