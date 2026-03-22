@@ -188,11 +188,21 @@ export const useLogListColumns = (): {
         sortable: true,
         filter: true,
         resizable: true,
+        filterValueGetter: (params) => {
+          const raw = params.data?.status;
+          return raw?.endsWith("-truncated")
+            ? raw.slice(0, -"-truncated".length)
+            : raw;
+        },
         cellRenderer: (params: ICellRendererParams<LogListRow>) => {
           const item = params.data;
           if (!item) return null;
 
-          const status = item.status;
+          const rawStatus = item.status;
+          const isTruncated = rawStatus?.endsWith("-truncated");
+          const status = isTruncated
+            ? rawStatus?.slice(0, -"-truncated".length)
+            : rawStatus;
 
           if (!status && item.type !== "pending-task") {
             return <EmptyCell />;
@@ -223,9 +233,9 @@ export const useLogListColumns = (): {
           return (
             <div className={styles.statusCell}>
               <i className={clsx(icon, clz)} />
-              {item.hasThinkingTruncation && (
+              {isTruncated && (
                 <i
-                  className={clsx(ApplicationIcons.warning, styles.warning)}
+                  className={clsx("bi bi-exclamation-triangle-fill", styles.warning)}
                   title={
                     item.thinkingTruncation
                       ? `${item.thinkingTruncation.truncated_samples}/${item.thinkingTruncation.total_samples} samples truncated (max_tokens hit with reasoning tokens)`

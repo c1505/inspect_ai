@@ -118923,7 +118923,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-5-g02a6dbc82" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-6-g2785b4d61" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -119550,16 +119550,16 @@ const styles$18 = {
   folder,
   fullWidthHeight
 };
-const nameCell = "_nameCell_122l5_1";
-const modelCell = "_modelCell_122l5_8";
-const scoreCell = "_scoreCell_122l5_15";
-const error$3 = "_error_122l5_22";
-const started = "_started_122l5_26";
-const success$1 = "_success_122l5_30";
-const cancelled$1 = "_cancelled_122l5_34";
-const warning = "_warning_122l5_38";
-const statusCell$1 = "_statusCell_122l5_42";
-const dateCell = "_dateCell_122l5_49";
+const nameCell = "_nameCell_14kld_1";
+const modelCell = "_modelCell_14kld_8";
+const scoreCell = "_scoreCell_14kld_15";
+const error$3 = "_error_14kld_22";
+const started = "_started_14kld_26";
+const success$1 = "_success_14kld_30";
+const cancelled$1 = "_cancelled_14kld_34";
+const warning = "_warning_14kld_38";
+const statusCell$1 = "_statusCell_14kld_42";
+const dateCell = "_dateCell_14kld_49";
 const localStyles = {
   nameCell,
   modelCell,
@@ -119709,10 +119709,16 @@ const useLogListColumns = () => {
         sortable: true,
         filter: true,
         resizable: true,
+        filterValueGetter: (params) => {
+          const raw = params.data?.status;
+          return raw?.endsWith("-truncated") ? raw.slice(0, -"-truncated".length) : raw;
+        },
         cellRenderer: (params) => {
           const item2 = params.data;
           if (!item2) return null;
-          const status2 = item2.status;
+          const rawStatus = item2.status;
+          const isTruncated = rawStatus?.endsWith("-truncated");
+          const status2 = isTruncated ? rawStatus?.slice(0, -"-truncated".length) : rawStatus;
           if (!status2 && item2.type !== "pending-task") {
             return /* @__PURE__ */ jsxRuntimeExports.jsx(EmptyCell, {});
           }
@@ -119720,10 +119726,10 @@ const useLogListColumns = () => {
           const clz = item2.type === "pending-task" ? styles$17.started : status2 === "error" ? styles$17.error : status2 === "started" ? styles$17.started : status2 === "cancelled" ? styles$17.cancelled : styles$17.success;
           return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: styles$17.statusCell, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: clsx(icon2, clz) }),
-            item2.hasThinkingTruncation && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            isTruncated && /* @__PURE__ */ jsxRuntimeExports.jsx(
               "i",
               {
-                className: clsx(ApplicationIcons.warning, styles$17.warning),
+                className: clsx("bi bi-exclamation-triangle-fill", styles$17.warning),
                 title: item2.thinkingTruncation ? `${item2.thinkingTruncation.truncated_samples}/${item2.thinkingTruncation.total_samples} samples truncated (max_tokens hit with reasoning tokens)` : "Output truncation detected"
               }
             )
@@ -176882,7 +176888,7 @@ const LogListGrid = ({
         task: item2.type === "file" ? preview?.task : item2.name,
         model: item2.type === "file" ? preview?.model : item2.type === "pending-task" ? item2.model : void 0,
         score: preview?.primary_metric?.value,
-        status: preview?.status,
+        status: preview?.thinking_truncation && preview?.status ? `${preview.status}-truncated` : preview?.status,
         completedAt: preview?.completed_at,
         itemCount: item2.type === "folder" ? item2.itemCount : void 0,
         log: item2.type === "file" ? item2.log : void 0
@@ -176899,7 +176905,6 @@ const LogListGrid = ({
         }
       }
       if (preview?.thinking_truncation) {
-        row2.hasThinkingTruncation = true;
         row2.thinkingTruncation = preview.thinking_truncation;
       }
       row2.searchText = [row2.name, row2.task, row2.model, row2.id].filter(Boolean).join(" ").toLowerCase();

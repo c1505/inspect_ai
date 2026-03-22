@@ -131,7 +131,9 @@ export const LogListGrid: FC<LogListGridProps> = ({
               ? item.model
               : undefined,
         score: preview?.primary_metric?.value,
-        status: preview?.status,
+        status: preview?.thinking_truncation && preview?.status
+          ? `${preview.status}-truncated`
+          : preview?.status,
         completedAt: preview?.completed_at,
         itemCount: item.type === "folder" ? item.itemCount : undefined,
         log: item.type === "file" ? item.log : undefined,
@@ -150,9 +152,8 @@ export const LogListGrid: FC<LogListGridProps> = ({
         }
       }
 
-      // Check for thinking-model truncation from preview data
+      // Attach truncation details for tooltip in status cell renderer
       if (preview?.thinking_truncation) {
-        row.hasThinkingTruncation = true;
         row.thinkingTruncation = preview.thinking_truncation;
       }
 

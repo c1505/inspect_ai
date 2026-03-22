@@ -16669,55 +16669,55 @@ button._segment_mhb7y_9 {
   width: inherit;
   height: inherit;
 }
-._nameCell_122l5_1 {
+._nameCell_14kld_1 {
   display: flex;
   align-items: center;
   min-width: 0;
   flex: 1;
 }
 
-._modelCell_122l5_8 {
+._modelCell_14kld_8 {
   display: flex;
   align-items: center;
   min-width: 0;
   flex: 1;
 }
 
-._scoreCell_122l5_15 {
+._scoreCell_14kld_15 {
   display: flex;
   align-items: center;
   font-size: 0.875rem;
   color: var(--bs-gray-600);
 }
 
-._error_122l5_22 {
+._error_14kld_22 {
   color: var(--bs-danger);
 }
 
-._started_122l5_26 {
+._started_14kld_26 {
   color: var(--bs-secondary);
 }
 
-._success_122l5_30 {
+._success_14kld_30 {
   color: var(--bs-success);
 }
 
-._cancelled_122l5_34 {
+._cancelled_14kld_34 {
   color: var(--bs-secondary);
 }
 
-._warning_122l5_38 {
+._warning_14kld_38 {
   color: var(--bs-warning);
 }
 
-._statusCell_122l5_42 {
+._statusCell_14kld_42 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
 }
 
-._dateCell_122l5_49 {
+._dateCell_14kld_49 {
   display: flex;
   align-items: center;
   min-width: 0;
