@@ -1313,7 +1313,7 @@ def create_eval_sample(
     # compute total time if we can
     total_time = time.monotonic() - start_time if start_time is not None else None
 
-    # derive thinking-truncation flag from transcript model events
+    # derive output-truncation flag from transcript model events
     # (avoids ContextVar propagation issues across async task boundaries)
     metadata = dict(state.metadata) if state.metadata else {}
     thinking_truncated = any(

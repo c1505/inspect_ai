@@ -1940,7 +1940,7 @@ def init_sample_model_usage() -> None:
 
 
 def record_thinking_truncation(model: str) -> None:
-    """Record that a thinking-model truncation occurred in this sample.
+    """Record that output truncation occurred on a reasoning model in this sample.
 
     Increments the eval-wide per-model counter (once per sample).
     Per-sample metadata is NOT set here — it is derived from transcript
@@ -1954,7 +1954,7 @@ def record_thinking_truncation(model: str) -> None:
 
 
 def thinking_truncation_counts() -> dict[str, int]:
-    """Get per-model counts of thinking-model truncations across the eval."""
+    """Get per-model counts of output truncations on reasoning models."""
     return thinking_truncation_counts_var.get({})
 
 
