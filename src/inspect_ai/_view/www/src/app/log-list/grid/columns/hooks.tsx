@@ -194,6 +194,11 @@ export const useLogListColumns = (): {
             ? raw.slice(0, -"-truncated".length)
             : raw;
         },
+        comparator: (valueA, valueB) => {
+          const a = (valueA ?? "").replace("-truncated", "");
+          const b = (valueB ?? "").replace("-truncated", "");
+          return a.localeCompare(b);
+        },
         cellRenderer: (params: ICellRendererParams<LogListRow>) => {
           const item = params.data;
           if (!item) return null;
