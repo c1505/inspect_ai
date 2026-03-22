@@ -592,9 +592,10 @@ const metadataViewsForSample = (
           label="Output Truncation"
         />
         <CardBody>
-          Response truncated. Reasoning tokens consumed most of the max_tokens
-          budget, leaving insufficient room for visible output. Increase
-          max_tokens or set reasoning.max_tokens to limit reasoning.
+          This response hit max_tokens while the model was using reasoning
+          tokens. Visible output may be incomplete because reasoning and output
+          share the same token budget. Consider increasing max_tokens or setting
+          reasoning.max_tokens to cap reasoning.
         </CardBody>
       </Card>,
     );

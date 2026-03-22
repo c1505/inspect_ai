@@ -531,11 +531,10 @@ async def task_run(options: TaskRunOptions) -> EvalLog:
                     pct = 100 * count / total_samples if total_samples else 0
                     py_logger.warning(
                         f"Output truncation: {model_name}: "
-                        f"{count}/{total_samples} samples ({pct:.0f}%) had "
-                        f"output truncated (max_tokens hit while reasoning "
-                        f"tokens present). Results may be unreliable. "
-                        f"Consider increasing max_tokens or setting "
-                        f"reasoning.max_tokens to limit reasoning."
+                        f"{count}/{total_samples} samples ({pct:.0f}%) hit "
+                        f"max_tokens while using reasoning tokens. Visible "
+                        f"output may be incomplete. Consider increasing "
+                        f"max_tokens or setting reasoning.max_tokens."
                     )
 
                 # store truncation info in results metadata for Inspect View
@@ -1313,17 +1312,18 @@ def create_eval_sample(
     # compute total time if we can
     total_time = time.monotonic() - start_time if start_time is not None else None
 
-    # derive output-truncation flag from transcript model events
-    # (avoids ContextVar propagation issues across async task boundaries)
+    # flag samples where output was truncated on a reasoning model:
+    # any generate() call that returned stop_reason=max_tokens while
+    # reasoning_tokens > 0 indicates the shared budget was exhausted
     metadata = dict(state.metadata) if state.metadata else {}
-    thinking_truncated = any(
+    output_truncated_with_reasoning = any(
         isinstance(e, ModelEvent)
         and e.output.stop_reason == "max_tokens"
         and e.output.usage is not None
         and (e.output.usage.reasoning_tokens or 0) > 0
         for e in transcript().events
     )
-    if thinking_truncated:
+    if output_truncated_with_reasoning:
         metadata["thinking_truncated"] = True
 
     return EvalSample(

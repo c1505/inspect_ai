@@ -1026,7 +1026,10 @@ class Model:
             if output.usage:
                 record_and_check_model_usage(f"{self}", output.usage, role=self.role)
 
-                # check for output truncation on reasoning models
+                # warn if output was truncated on a reasoning model —
+                # stop_reason=max_tokens is the truncation signal;
+                # reasoning_tokens > 0 narrows to models where the
+                # shared budget is the likely cause
                 if (
                     output.stop_reason == "max_tokens"
                     and output.usage.reasoning_tokens
@@ -1035,13 +1038,12 @@ class Model:
                     record_thinking_truncation(f"{self}")
                     warn_once(
                         logger,
-                        f"Output truncation detected for reasoning model "
-                        f"{self}: max_tokens hit with reasoning_tokens > 0. "
-                        f"Reasoning tokens may have consumed most of the "
-                        f"token budget, leaving insufficient room for "
-                        f"visible output. Consider increasing max_tokens "
-                        f"or setting reasoning.max_tokens to limit "
-                        f"reasoning token usage.",
+                        f"Output truncated: {self} hit max_tokens while "
+                        f"using reasoning tokens. The model's visible "
+                        f"output may be incomplete because reasoning and "
+                        f"output share the same token budget. Consider "
+                        f"increasing max_tokens or setting "
+                        f"reasoning.max_tokens to cap reasoning.",
                     )
 
                 # send telemetry to hooks
