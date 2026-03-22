@@ -118923,7 +118923,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-8-gf3421e816" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-9-g529510c3a" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -179477,18 +179477,16 @@ const ChatViewVirtualListComponent = reactExports.memo(
     );
   }
 );
-const tabPanel = "_tabPanel_seell_1";
-const tabControls = "_tabControls_seell_5";
-const fullWidth$1 = "_fullWidth_seell_12";
-const padded = "_padded_seell_25";
-const error$2 = "_error_seell_30";
-const ansi = "_ansi_seell_34";
-const noTop = "_noTop_seell_38";
-const chat = "_chat_seell_50";
-const transcriptContainer = "_transcriptContainer_seell_58";
-const overflowVisible$1 = "_overflowVisible_seell_62";
-const truncationBanner = "_truncationBanner_seell_66";
-const truncationTitle = "_truncationTitle_seell_76";
+const tabPanel = "_tabPanel_20s9q_1";
+const tabControls = "_tabControls_20s9q_5";
+const fullWidth$1 = "_fullWidth_20s9q_12";
+const padded = "_padded_20s9q_25";
+const error$2 = "_error_20s9q_30";
+const ansi = "_ansi_20s9q_34";
+const noTop = "_noTop_20s9q_38";
+const chat = "_chat_20s9q_50";
+const transcriptContainer = "_transcriptContainer_20s9q_58";
+const overflowVisible$1 = "_overflowVisible_20s9q_62";
 const styles$Z = {
   tabPanel,
   tabControls,
@@ -179499,9 +179497,7 @@ const styles$Z = {
   noTop,
   chat,
   transcriptContainer,
-  overflowVisible: overflowVisible$1,
-  truncationBanner,
-  truncationTitle
+  overflowVisible: overflowVisible$1
 };
 function truncateMarkdown(markdown, maxLength = 250, ellipsis2 = "...") {
   if (!markdown || markdown.length <= maxLength) {
@@ -193392,13 +193388,16 @@ const metadataViewsForSample = (id, scrollRef, sample2) => {
   }
   if (sample2.metadata?.thinking_truncated) {
     sampleMetadatas.push(
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: styles$Z.truncationBanner, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: "bi bi-exclamation-triangle" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: styles$Z.truncationTitle, children: "Thinking-Model Truncation" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "This sample hit max_tokens with reasoning tokens present. Visible output may be severely truncated. Consider increasing max_tokens or setting reasoning_tokens." })
-        ] })
-      ] }) }) }, `sample-truncation-${id}`)
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          CardHeader,
+          {
+            icon: "bi bi-exclamation-triangle",
+            label: "Thinking-Model Truncation"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardBody, { children: "This sample hit max_tokens with reasoning tokens present. Visible output may be severely truncated. Consider increasing max_tokens or setting reasoning_tokens." })
+      ] }, `sample-truncation-${id}`)
     );
   }
   if (sample2.model_usage && Object.keys(sample2.model_usage).length > 0) {
