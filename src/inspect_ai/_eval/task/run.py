@@ -523,19 +523,19 @@ async def task_run(options: TaskRunOptions) -> EvalLog:
             # collect eval data
             collect_eval_data(stats)
 
-            # warn about thinking-model truncation
+            # warn about output truncation on reasoning models
             trunc_counts = thinking_truncation_counts()
             if trunc_counts:
                 total_samples = profile.samples
                 for model_name, count in trunc_counts.items():
                     pct = 100 * count / total_samples if total_samples else 0
                     py_logger.warning(
-                        f"Thinking-model truncation summary: {model_name}: "
-                        f"{count}/{total_samples} samples ({pct:.0f}%) hit "
-                        f"max_tokens with reasoning tokens present. Results "
-                        f"may be unreliable. Consider increasing max_tokens "
-                        f"or setting reasoning_tokens to cap the thinking "
-                        f"budget."
+                        f"Output truncation: {model_name}: "
+                        f"{count}/{total_samples} samples ({pct:.0f}%) had "
+                        f"output truncated (max_tokens hit while reasoning "
+                        f"tokens present). Results may be unreliable. "
+                        f"Consider increasing max_tokens or setting "
+                        f"reasoning.max_tokens to limit reasoning."
                     )
 
                 # store truncation info in results metadata for Inspect View

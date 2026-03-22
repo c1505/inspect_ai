@@ -245,7 +245,7 @@ export const useLogListColumns = (): {
                   className={clsx("bi bi-exclamation-triangle-fill", styles.warning)}
                   title={
                     item.thinkingTruncation
-                      ? `${item.thinkingTruncation.truncated_samples}/${item.thinkingTruncation.total_samples} samples truncated (max_tokens hit with reasoning tokens)`
+                      ? `${item.thinkingTruncation.truncated_samples}/${item.thinkingTruncation.total_samples} samples had output truncated (reasoning model)`
                       : "Output truncation detected"
                   }
                 />

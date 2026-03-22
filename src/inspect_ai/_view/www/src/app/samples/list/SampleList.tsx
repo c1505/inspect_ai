@@ -295,7 +295,7 @@ export const SampleList: FC<SampleListProps> = memo((props) => {
         sampleCount > 0 ? (truncatedCount / sampleCount) * 100 : 0;
       result.push({
         type: "warning",
-        msg: `WARNING: ${truncatedCount} of ${sampleCount} samples (${formatNoDecimal(percentTruncated)}%) had thinking-model truncation (reasoning tokens consumed max_tokens budget). Results may be unreliable.`,
+        msg: `WARNING: ${truncatedCount} of ${sampleCount} samples (${formatNoDecimal(percentTruncated)}%) had output truncated — reasoning tokens consumed most of the max_tokens budget. Results may be unreliable.`,
       });
     }
     return result;

@@ -118923,7 +118923,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-9-g529510c3a" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-10-g5bcdd159c" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -119734,7 +119734,7 @@ const useLogListColumns = () => {
               "i",
               {
                 className: clsx("bi bi-exclamation-triangle-fill", styles$17.warning),
-                title: item2.thinkingTruncation ? `${item2.thinkingTruncation.truncated_samples}/${item2.thinkingTruncation.total_samples} samples truncated (max_tokens hit with reasoning tokens)` : "Output truncation detected"
+                title: item2.thinkingTruncation ? `${item2.thinkingTruncation.truncated_samples}/${item2.thinkingTruncation.total_samples} samples had output truncated (reasoning model)` : "Output truncation detected"
               }
             )
           ] });
@@ -193393,10 +193393,10 @@ const metadataViewsForSample = (id, scrollRef, sample2) => {
           CardHeader,
           {
             icon: "bi bi-exclamation-triangle",
-            label: "Thinking-Model Truncation"
+            label: "Output Truncation"
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardBody, { children: "This sample hit max_tokens with reasoning tokens present. Visible output may be severely truncated. Consider increasing max_tokens or setting reasoning_tokens." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardBody, { children: "Response truncated. Reasoning tokens consumed most of the max_tokens budget, leaving insufficient room for visible output. Increase max_tokens or set reasoning.max_tokens to limit reasoning." })
       ] }, `sample-truncation-${id}`)
     );
   }
@@ -216164,7 +216164,7 @@ const SampleList = reactExports.memo((props) => {
       const percentTruncated = sampleCount > 0 ? truncatedCount / sampleCount * 100 : 0;
       result2.push({
         type: "warning",
-        msg: `WARNING: ${truncatedCount} of ${sampleCount} samples (${formatNoDecimal(percentTruncated)}%) had thinking-model truncation (reasoning tokens consumed max_tokens budget). Results may be unreliable.`
+        msg: `WARNING: ${truncatedCount} of ${sampleCount} samples (${formatNoDecimal(percentTruncated)}%) had output truncated — reasoning tokens consumed most of the max_tokens budget. Results may be unreliable.`
       });
     }
     return result2;

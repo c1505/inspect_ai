@@ -589,12 +589,12 @@ const metadataViewsForSample = (
       <Card key={`sample-truncation-${id}`}>
         <CardHeader
           icon="bi bi-exclamation-triangle"
-          label="Thinking-Model Truncation"
+          label="Output Truncation"
         />
         <CardBody>
-          This sample hit max_tokens with reasoning tokens present. Visible
-          output may be severely truncated. Consider increasing max_tokens or
-          setting reasoning_tokens.
+          Response truncated. Reasoning tokens consumed most of the max_tokens
+          budget, leaving insufficient room for visible output. Increase
+          max_tokens or set reasoning.max_tokens to limit reasoning.
         </CardBody>
       </Card>,
     );
