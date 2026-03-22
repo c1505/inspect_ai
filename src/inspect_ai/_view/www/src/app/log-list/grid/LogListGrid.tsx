@@ -150,11 +150,10 @@ export const LogListGrid: FC<LogListGridProps> = ({
         }
       }
 
-      // Check for thinking-model truncation in sample summaries
-      if (details?.sampleSummaries) {
-        row.hasThinkingTruncation = details.sampleSummaries.some(
-          (s) => s.metadata?.thinking_truncated === true,
-        );
+      // Check for thinking-model truncation from preview data
+      if (preview?.thinking_truncation) {
+        row.hasThinkingTruncation = true;
+        row.thinkingTruncation = preview.thinking_truncation;
       }
 
       // Pre-compute searchable text for fast Cmd+F search

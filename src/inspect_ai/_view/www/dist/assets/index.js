@@ -28083,8 +28083,20 @@ const toLogPreview = (header2) => {
     model: header2.eval.model,
     started_at: header2.stats?.started_at,
     completed_at: header2.stats?.completed_at,
-    primary_metric: primaryMetric(header2.results)
+    primary_metric: primaryMetric(header2.results),
+    thinking_truncation: thinkingTruncation(header2.results)
   };
+};
+const thinkingTruncation = (evalResults) => {
+  const meta2 = evalResults?.metadata;
+  const trunc = meta2?.thinking_truncation;
+  if (trunc && typeof trunc.truncated_samples === "number" && trunc.truncated_samples > 0) {
+    return {
+      truncated_samples: trunc.truncated_samples,
+      total_samples: trunc.total_samples ?? 0
+    };
+  }
+  return void 0;
 };
 const primaryMetric = (evalResults) => {
   if (evalResults?.scores && evalResults?.scores.length > 0) {
@@ -110997,7 +111009,18 @@ function viewServerApi(options2 = {}) {
       model: header2.eval.model,
       started_at: header2.stats?.started_at,
       completed_at: header2.stats?.completed_at,
-      primary_metric
+      primary_metric,
+      thinking_truncation: (() => {
+        const meta2 = header2.results?.metadata;
+        const trunc = meta2?.thinking_truncation;
+        if (trunc && typeof trunc.truncated_samples === "number" && trunc.truncated_samples > 0) {
+          return {
+            truncated_samples: trunc.truncated_samples,
+            total_samples: trunc.total_samples ?? 0
+          };
+        }
+        return void 0;
+      })()
     };
   };
   const get_log_bytes2 = async (file, start2, end2) => requestApi.fetchBytes(
@@ -118900,7 +118923,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-4-g8f46d1457" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-5-g02a6dbc82" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -119701,7 +119724,7 @@ const useLogListColumns = () => {
               "i",
               {
                 className: clsx(ApplicationIcons.warning, styles$17.warning),
-                title: "Thinking-model truncation detected"
+                title: item2.thinkingTruncation ? `${item2.thinkingTruncation.truncated_samples}/${item2.thinkingTruncation.total_samples} samples truncated (max_tokens hit with reasoning tokens)` : "Output truncation detected"
               }
             )
           ] });
@@ -176875,10 +176898,9 @@ const LogListGrid = ({
           }
         }
       }
-      if (details?.sampleSummaries) {
-        row2.hasThinkingTruncation = details.sampleSummaries.some(
-          (s) => s.metadata?.thinking_truncated === true
-        );
+      if (preview?.thinking_truncation) {
+        row2.hasThinkingTruncation = true;
+        row2.thinkingTruncation = preview.thinking_truncation;
       }
       row2.searchText = [row2.name, row2.task, row2.model, row2.id].filter(Boolean).join(" ").toLowerCase();
       return row2;

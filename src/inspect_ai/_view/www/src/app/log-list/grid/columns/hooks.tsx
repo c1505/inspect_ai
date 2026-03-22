@@ -226,7 +226,11 @@ export const useLogListColumns = (): {
               {item.hasThinkingTruncation && (
                 <i
                   className={clsx(ApplicationIcons.warning, styles.warning)}
-                  title="Thinking-model truncation detected"
+                  title={
+                    item.thinkingTruncation
+                      ? `${item.thinkingTruncation.truncated_samples}/${item.thinkingTruncation.total_samples} samples truncated (max_tokens hit with reasoning tokens)`
+                      : "Output truncation detected"
+                  }
                 />
               )}
             </div>

@@ -538,6 +538,17 @@ async def task_run(options: TaskRunOptions) -> EvalLog:
                         f"budget."
                     )
 
+                # store truncation info in results metadata for Inspect View
+                if results is not None:
+                    if results.metadata is None:
+                        results.metadata = {}
+                    total_truncated = sum(trunc_counts.values())
+                    results.metadata["thinking_truncation"] = {
+                        "truncated_samples": total_truncated,
+                        "total_samples": total_samples,
+                        "models": dict(trunc_counts),
+                    }
+
             sample_error_count = sum(result is None for result in sample_results)
             mark_log_as_error = _should_eval_fail(
                 sample_error_count, profile.samples, config.fail_on_error

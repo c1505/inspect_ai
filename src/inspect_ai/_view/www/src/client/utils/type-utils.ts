@@ -20,7 +20,32 @@ export const toLogPreview = (header: EvalHeader | LogDetails): LogPreview => {
     completed_at: header.stats?.completed_at,
 
     primary_metric: primaryMetric(header.results),
+
+    thinking_truncation: thinkingTruncation(header.results),
   };
+};
+
+const thinkingTruncation = (
+  evalResults?: EvalResults | null,
+): { truncated_samples: number; total_samples: number } | undefined => {
+  const meta = evalResults?.metadata as
+    | Record<string, unknown>
+    | undefined
+    | null;
+  const trunc = meta?.thinking_truncation as
+    | { truncated_samples?: number; total_samples?: number }
+    | undefined;
+  if (
+    trunc &&
+    typeof trunc.truncated_samples === "number" &&
+    trunc.truncated_samples > 0
+  ) {
+    return {
+      truncated_samples: trunc.truncated_samples,
+      total_samples: trunc.total_samples ?? 0,
+    };
+  }
+  return undefined;
 };
 
 const primaryMetric = (

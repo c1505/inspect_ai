@@ -303,6 +303,11 @@ export interface LogPreview {
   completed_at?: CompletedAt;
 
   primary_metric?: EvalMetric;
+
+  thinking_truncation?: {
+    truncated_samples: number;
+    total_samples: number;
+  };
 }
 
 export interface LogRoot {

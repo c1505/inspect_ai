@@ -194,6 +194,27 @@ export function viewServerApi(
       completed_at: header.stats?.completed_at,
 
       primary_metric,
+
+      thinking_truncation: (() => {
+        const meta = header.results?.metadata as
+          | Record<string, unknown>
+          | undefined
+          | null;
+        const trunc = meta?.thinking_truncation as
+          | { truncated_samples?: number; total_samples?: number }
+          | undefined;
+        if (
+          trunc &&
+          typeof trunc.truncated_samples === "number" &&
+          trunc.truncated_samples > 0
+        ) {
+          return {
+            truncated_samples: trunc.truncated_samples,
+            total_samples: trunc.total_samples ?? 0,
+          };
+        }
+        return undefined;
+      })(),
     };
   };
 
