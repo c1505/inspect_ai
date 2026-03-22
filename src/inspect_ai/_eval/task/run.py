@@ -933,8 +933,6 @@ async def task_run_sample(
                                     async with span("solvers"):
                                         state = await plan(state, generate)
 
-
-
                                 # some 'cancel' exceptions are actually user interrupts or the
                                 # result of monitor_working_limit() - for these exceptions we
                                 # want to intercept them and apply the appropriate control flow

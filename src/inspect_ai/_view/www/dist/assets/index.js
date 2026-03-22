@@ -118923,7 +118923,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-7-g0b43154cc" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-8-gf3421e816" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -119714,9 +119714,8 @@ const useLogListColumns = () => {
           return raw?.endsWith("-truncated") ? raw.slice(0, -"-truncated".length) : raw;
         },
         comparator: (valueA, valueB) => {
-          const a = (valueA ?? "").replace("-truncated", "");
-          const b = (valueB ?? "").replace("-truncated", "");
-          return a.localeCompare(b);
+          const strip = (v) => v.endsWith("-truncated") ? v.slice(0, -"-truncated".length) : v;
+          return strip(valueA ?? "").localeCompare(strip(valueB ?? ""));
         },
         cellRenderer: (params) => {
           const item2 = params.data;
