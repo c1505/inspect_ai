@@ -285,6 +285,19 @@ export const SampleList: FC<SampleListProps> = memo((props) => {
         msg: `Skipped ${earlyStopping.early_stops.length} samples due to early stopping (${earlyStopping.manager}). `,
       });
     }
+    const truncatedCount = items.reduce(
+      (prev, item) =>
+        item.data.metadata?.thinking_truncated ? prev + 1 : prev,
+      0,
+    );
+    if (truncatedCount > 0) {
+      const percentTruncated =
+        sampleCount > 0 ? (truncatedCount / sampleCount) * 100 : 0;
+      result.push({
+        type: "warning",
+        msg: `WARNING: ${truncatedCount} of ${sampleCount} samples (${formatNoDecimal(percentTruncated)}%) hit max_tokens while using reasoning tokens. Visible output may be incomplete. Results may be unreliable.`,
+      });
+    }
     return result;
   }, [items, sampleCount, earlyStopping]);
 

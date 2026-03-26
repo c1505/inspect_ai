@@ -35,11 +35,15 @@
   color: var(--bs-secondary);
 }
 
+.warning {
+  color: var(--bs-warning);
+}
+
 .statusCell {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
 }
 
 .dateCell {

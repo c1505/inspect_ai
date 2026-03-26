@@ -16314,7 +16314,7 @@ function createHashHistory(options2 = {}) {
     return href + "#" + (typeof to2 === "string" ? to2 : createPath(to2));
   }
   function validateHashLocation(location2, to2) {
-    warning(
+    warning$1(
       location2.pathname.charAt(0) === "/",
       `relative pathnames are not supported in hash history.push(${JSON.stringify(
         to2
@@ -16333,7 +16333,7 @@ function invariant(value2, message2) {
     throw new Error(message2);
   }
 }
-function warning(cond, message2) {
+function warning$1(cond, message2) {
   if (!cond) {
     if (typeof console !== "undefined") console.warn(message2);
     try {
@@ -16870,7 +16870,7 @@ function matchPath(pattern, pathname) {
   };
 }
 function compilePath(path, caseSensitive = false, end2 = true) {
-  warning(
+  warning$1(
     path === "*" || !path.endsWith("*") || path.endsWith("/*"),
     `Route path "${path}" will be treated as if it were "${path.replace(/\*$/, "/*")}" because the \`*\` character must always follow a \`/\` in the pattern. To get rid of this warning, please change the route path to "${path.replace(/\*$/, "/*")}".`
   );
@@ -16897,7 +16897,7 @@ function decodePath(value2) {
   try {
     return value2.split("/").map((v) => decodeURIComponent(v).replace(/\//g, "%2F")).join("/");
   } catch (error2) {
-    warning(
+    warning$1(
       false,
       `The URL path "${value2}" could not be decoded because it is a malformed URL segment. This is probably due to a bad percent encoding (${error2}).`
     );
@@ -17065,7 +17065,7 @@ function parseToInfo(_to, basename2) {
         isExternal = true;
       }
     } catch (e) {
-      warning(
+      warning$1(
         false,
         `<Link to="${to2}"> contains an invalid URL which will probably break when clicked - please update to a valid URL path.`
       );
@@ -17511,7 +17511,7 @@ function createRouter(init2) {
           unblockBlockerHistoryUpdate = void 0;
           return;
         }
-        warning(
+        warning$1(
           blockerFunctions.size === 0 || delta2 != null,
           "You are trying to use a blocker on a POP navigation to a location that was not created by @remix-run/router. This will fail silently in production. This can happen if you are navigating outside the router via `window.history.pushState`/`window.location.hash` instead of using router navigation APIs.  This can also happen if you are using createHashRouter and the user manually changes the URL."
         );
@@ -18978,7 +18978,7 @@ function createRouter(init2) {
       return;
     }
     if (blockerFunctions.size > 1) {
-      warning(false, "A router only supports one blocker at a time");
+      warning$1(false, "A router only supports one blocker at a time");
     }
     let entries = Array.from(blockerFunctions.entries());
     let [blockerKey, blockerFunction] = entries[entries.length - 1];
@@ -19697,13 +19697,13 @@ var loadLazyRouteProperty = ({
     let staticRouteValue = routeToUpdate[key2];
     let isStaticallyDefined = staticRouteValue !== void 0 && key2 !== "hasErrorBoundary";
     if (isUnsupported) {
-      warning(
+      warning$1(
         !isUnsupported,
         "Route property " + key2 + " is not a supported lazy route property. This property will be ignored."
       );
       cache[key2] = Promise.resolve();
     } else if (isStaticallyDefined) {
-      warning(
+      warning$1(
         false,
         `Route "${routeToUpdate.id}" has a static property "${key2}" defined. The lazy property will be ignored.`
       );
@@ -19760,12 +19760,12 @@ function loadLazyRoute(route, type, manifest, mapRouteProperties2, lazyRouteProp
         // on the route updates
         lazyRouteProperty !== "hasErrorBoundary";
         if (isUnsupported) {
-          warning(
+          warning$1(
             !isUnsupported,
             "Route property " + lazyRouteProperty + " is not a supported property to be returned from a lazy route function. This property will be ignored."
           );
         } else if (isStaticallyDefined) {
-          warning(
+          warning$1(
             !isStaticallyDefined,
             `Route "${routeToUpdate.id}" has a static property "${lazyRouteProperty}" defined but its lazy function is also returning a value for this property. The lazy route property "${lazyRouteProperty}" will be ignored.`
           );
@@ -20762,7 +20762,7 @@ function persistAppliedTransitions(_window, transitions) {
         JSON.stringify(json)
       );
     } catch (error2) {
-      warning(
+      warning$1(
         false,
         `Failed to save applied view transitions in sessionStorage (${error2}).`
       );
@@ -20917,7 +20917,7 @@ function useNavigateUnstable() {
   });
   let navigate = reactExports.useCallback(
     (to2, options2 = {}) => {
-      warning(activeRef.current, navigateEffectWarning);
+      warning$1(activeRef.current, navigateEffectWarning);
       if (!activeRef.current) return;
       if (typeof to2 === "number") {
         navigator2.go(to2);
@@ -21013,11 +21013,11 @@ Please change the parent <Route path="${parentPath}"> to <Route path="${parentPa
   }
   let matches = matchRoutes(routes, { pathname: remainingPathname });
   {
-    warning(
+    warning$1(
       parentRoute || matches != null,
       `No routes matched location "${location2.pathname}${location2.search}${location2.hash}" `
     );
-    warning(
+    warning$1(
       matches == null || matches[matches.length - 1].route.element !== void 0 || matches[matches.length - 1].route.Component !== void 0 || matches[matches.length - 1].route.lazy !== void 0,
       `Matched leaf route at location "${location2.pathname}${location2.search}${location2.hash}" does not have an element or Component. This means it will render an <Outlet /> with a null value by default resulting in an "empty" page.`
     );
@@ -21363,7 +21363,7 @@ function useNavigateStable() {
   });
   let navigate = reactExports.useCallback(
     async (to2, options2 = {}) => {
-      warning(activeRef.current, navigateEffectWarning);
+      warning$1(activeRef.current, navigateEffectWarning);
       if (!activeRef.current) return;
       if (typeof to2 === "number") {
         await router.navigate(to2);
@@ -21379,7 +21379,7 @@ var alreadyWarned = {};
 function warningOnce(key2, cond, message2) {
   if (!cond && !alreadyWarned[key2]) {
     alreadyWarned[key2] = true;
-    warning(false, message2);
+    warning$1(false, message2);
   }
 }
 var alreadyWarned2 = {};
@@ -21408,7 +21408,7 @@ function mapRouteProperties(route) {
   if (route.Component) {
     {
       if (route.element) {
-        warning(
+        warning$1(
           false,
           "You should not include both `Component` and `element` on your route - `Component` will be used."
         );
@@ -21422,7 +21422,7 @@ function mapRouteProperties(route) {
   if (route.HydrateFallback) {
     {
       if (route.hydrateFallbackElement) {
-        warning(
+        warning$1(
           false,
           "You should not include both `HydrateFallback` and `hydrateFallbackElement` on your route - `HydrateFallback` will be used."
         );
@@ -21436,7 +21436,7 @@ function mapRouteProperties(route) {
   if (route.ErrorBoundary) {
     {
       if (route.errorElement) {
-        warning(
+        warning$1(
           false,
           "You should not include both `ErrorBoundary` and `errorElement` on your route - `ErrorBoundary` will be used."
         );
@@ -21724,7 +21724,7 @@ function Navigate({
     `<Navigate> may be used only in the context of a <Router> component.`
   );
   let { static: isStatic } = reactExports.useContext(NavigationContext);
-  warning(
+  warning$1(
     !isStatic,
     `<Navigate> must not be used on the initial render in a <StaticRouter>. This is a no-op, but you should modify your code so the <Navigate> is only ever rendered in response to some user interaction or state change.`
   );
@@ -21796,7 +21796,7 @@ function Router({
       navigationType
     };
   }, [basename2, pathname, search, hash2, state, key2, navigationType]);
-  warning(
+  warning$1(
     locationContext != null,
     `<Router basename="${basename2}"> is not able to match the URL "${pathname}${search}${hash2}" because it does not start with the basename, so the <Router> won't render anything.`
   );
@@ -21873,7 +21873,7 @@ var supportedFormEncTypes = /* @__PURE__ */ new Set([
 ]);
 function getFormEncType(encType) {
   if (encType != null && !supportedFormEncTypes.has(encType)) {
-    warning(
+    warning$1(
       false,
       `"${encType}" is not a valid \`encType\` for \`<Form>\`/\`<fetcher.Form>\` and will default to "${defaultEncType}"`
     );
@@ -22645,7 +22645,7 @@ function useLinkClickHandler(to2, {
   );
 }
 function useSearchParams(defaultInit) {
-  warning(
+  warning$1(
     typeof URLSearchParams !== "undefined",
     `You cannot use the \`useSearchParams\` hook in a browser that does not support the URLSearchParams API. If you need to support Internet Explorer 11, we recommend you load a polyfill such as https://github.com/ungap/url-search-params.`
   );
@@ -28083,8 +28083,20 @@ const toLogPreview = (header2) => {
     model: header2.eval.model,
     started_at: header2.stats?.started_at,
     completed_at: header2.stats?.completed_at,
-    primary_metric: primaryMetric(header2.results)
+    primary_metric: primaryMetric(header2.results),
+    thinking_truncation: thinkingTruncation(header2.results)
   };
+};
+const thinkingTruncation = (evalResults) => {
+  const meta2 = evalResults?.metadata;
+  const trunc = meta2?.thinking_truncation;
+  if (trunc && typeof trunc.truncated_samples === "number" && trunc.truncated_samples > 0) {
+    return {
+      truncated_samples: trunc.truncated_samples,
+      total_samples: trunc.total_samples ?? 0
+    };
+  }
+  return void 0;
 };
 const primaryMetric = (evalResults) => {
   if (evalResults?.scores && evalResults?.scores.length > 0) {
@@ -28095,6 +28107,26 @@ const primaryMetric = (evalResults) => {
     }
   }
   return void 0;
+};
+const detectTruncationFromEvents = (events) => {
+  if (!events || events.length === 0) return false;
+  for (const event of events) {
+    if (isModelEvent$1(event) && isOutputTruncated(event)) {
+      return true;
+    }
+  }
+  return false;
+};
+const isModelEvent$1 = (event) => {
+  return "event" in event && event.event === "model";
+};
+const isOutputTruncated = (event) => {
+  const output2 = event.output;
+  if (!output2) return false;
+  const stopReason = output2.choices?.[0]?.stop_reason;
+  if (stopReason !== "max_tokens") return false;
+  const reasoning2 = output2.usage?.reasoning_tokens;
+  return typeof reasoning2 === "number" && reasoning2 > 0;
 };
 const directoryRelativeUrl = (file, dir) => {
   if (!dir) {
@@ -110464,7 +110496,11 @@ const clientApi = (api2, log_file, debug2 = false) => {
       }
     ),
     get_log_pending_samples: api2.eval_pending_samples ? middleware("get_log_pending_samples", get_log_pending_samples) : void 0,
-    get_log_sample_data: api2.eval_log_sample_data ? middleware("get_log_sample_data", get_log_sample_data) : void 0
+    get_log_sample_data: api2.eval_log_sample_data ? middleware("get_log_sample_data", get_log_sample_data) : void 0,
+    get_log_truncation_counts: api2.get_log_truncation_counts ? middleware(
+      "get_log_truncation_counts",
+      (files) => api2.get_log_truncation_counts(files)
+    ) : void 0
   };
 };
 const debugMiddleware = (name2, _fn, args2, result2) => {
@@ -110980,26 +111016,6 @@ function viewServerApi(options2 = {}) {
     );
     return result2.parsed;
   };
-  const toLogPreview2 = (header2) => {
-    const scores2 = Object.values(header2.results?.scores || {});
-    const metric = scores2.length > 0 ? scores2[0].metrics : void 0;
-    const evalMetrics = Object.values(metric || {});
-    const primary_metric = evalMetrics.length > 0 ? evalMetrics[0] : void 0;
-    return {
-      eval_id: header2.eval.eval_id,
-      run_id: header2.eval.run_id,
-      task: header2.eval.task,
-      task_id: header2.eval.task_id,
-      task_version: header2.eval.task_version,
-      version: header2.version,
-      status: header2.status,
-      error: header2.error,
-      model: header2.eval.model,
-      started_at: header2.stats?.started_at,
-      completed_at: header2.stats?.completed_at,
-      primary_metric
-    };
-  };
   const get_log_bytes2 = async (file, start2, end2) => requestApi.fetchBytes(
     "GET",
     `/log-bytes/${encodeURIComponent(file)}?start=${start2}&end=${end2}`
@@ -111014,7 +111030,7 @@ function viewServerApi(options2 = {}) {
       `/log-headers?${params.toString()}`
     );
     const logHeaders = result2.parsed;
-    return logHeaders.map(toLogPreview2);
+    return logHeaders.map(toLogPreview);
   };
   const log_message2 = async (log_file, message2) => {
     const params = new URLSearchParams();
@@ -111123,6 +111139,17 @@ function viewServerApi(options2 = {}) {
     link2.click();
     document.body.removeChild(link2);
   };
+  const get_log_truncation_counts = async (files) => {
+    const params = new URLSearchParams();
+    for (const file of files) {
+      params.append("file", file);
+    }
+    const result2 = await requestApi.fetchString(
+      "GET",
+      `/log-truncation-counts?${params.toString()}`
+    );
+    return result2.parsed;
+  };
   return {
     client_events: client_events2,
     get_log_root: get_log_root2,
@@ -111140,7 +111167,8 @@ function viewServerApi(options2 = {}) {
     open_log_file: async () => {
     },
     eval_pending_samples: eval_pending_samples2,
-    eval_log_sample_data: eval_log_sample_data2
+    eval_log_sample_data: eval_log_sample_data2,
+    get_log_truncation_counts
   };
 }
 const kMethodEvalLogDir = "eval_log_dir";
@@ -118900,7 +118928,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.199-28-gc856926c2" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-13-g1b69ace2e" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -119527,15 +119555,16 @@ const styles$18 = {
   folder,
   fullWidthHeight
 };
-const nameCell = "_nameCell_1jtud_1";
-const modelCell = "_modelCell_1jtud_8";
-const scoreCell = "_scoreCell_1jtud_15";
-const error$3 = "_error_1jtud_22";
-const started = "_started_1jtud_26";
-const success$1 = "_success_1jtud_30";
-const cancelled$1 = "_cancelled_1jtud_34";
-const statusCell$1 = "_statusCell_1jtud_38";
-const dateCell = "_dateCell_1jtud_45";
+const nameCell = "_nameCell_14kld_1";
+const modelCell = "_modelCell_14kld_8";
+const scoreCell = "_scoreCell_14kld_15";
+const error$3 = "_error_14kld_22";
+const started = "_started_14kld_26";
+const success$1 = "_success_14kld_30";
+const cancelled$1 = "_cancelled_14kld_34";
+const warning = "_warning_14kld_38";
+const statusCell$1 = "_statusCell_14kld_42";
+const dateCell = "_dateCell_14kld_49";
 const localStyles = {
   nameCell,
   modelCell,
@@ -119544,6 +119573,7 @@ const localStyles = {
   started,
   success: success$1,
   cancelled: cancelled$1,
+  warning,
   statusCell: statusCell$1,
   dateCell
 };
@@ -119684,16 +119714,35 @@ const useLogListColumns = () => {
         sortable: true,
         filter: true,
         resizable: true,
+        filterValueGetter: (params) => {
+          const raw = params.data?.status;
+          return raw?.endsWith("-truncated") ? raw.slice(0, -"-truncated".length) : raw;
+        },
+        comparator: (valueA, valueB) => {
+          const strip = (v) => v.endsWith("-truncated") ? v.slice(0, -"-truncated".length) : v;
+          return strip(valueA ?? "").localeCompare(strip(valueB ?? ""));
+        },
         cellRenderer: (params) => {
           const item2 = params.data;
           if (!item2) return null;
-          const status2 = item2.status;
+          const rawStatus = item2.status;
+          const isTruncated = rawStatus?.endsWith("-truncated");
+          const status2 = isTruncated ? rawStatus?.slice(0, -"-truncated".length) : rawStatus;
           if (!status2 && item2.type !== "pending-task") {
             return /* @__PURE__ */ jsxRuntimeExports.jsx(EmptyCell, {});
           }
           const icon2 = item2.type === "pending-task" ? ApplicationIcons.pendingTask : status2 === "error" ? ApplicationIcons.error : status2 === "started" ? ApplicationIcons.running : status2 === "cancelled" ? ApplicationIcons.cancelled : ApplicationIcons.success;
           const clz = item2.type === "pending-task" ? styles$17.started : status2 === "error" ? styles$17.error : status2 === "started" ? styles$17.started : status2 === "cancelled" ? styles$17.cancelled : styles$17.success;
-          return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: styles$17.statusCell, children: /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: clsx(icon2, clz) }) });
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: styles$17.statusCell, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("i", { className: clsx(icon2, clz) }),
+            isTruncated && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "i",
+              {
+                className: clsx("bi bi-exclamation-triangle-fill", styles$17.warning),
+                title: item2.thinkingTruncation ? `${item2.thinkingTruncation.truncated_samples}/${item2.thinkingTruncation.total_samples} samples hit max_tokens while using reasoning tokens` : "Output truncation detected"
+              }
+            )
+          ] });
         }
       },
       {
@@ -176848,7 +176897,7 @@ const LogListGrid = ({
         task: item2.type === "file" ? preview?.task : item2.name,
         model: item2.type === "file" ? preview?.model : item2.type === "pending-task" ? item2.model : void 0,
         score: preview?.primary_metric?.value,
-        status: preview?.status,
+        status: preview?.thinking_truncation && preview?.status ? `${preview.status}-truncated` : preview?.status,
         completedAt: preview?.completed_at,
         itemCount: item2.type === "folder" ? item2.itemCount : void 0,
         log: item2.type === "file" ? item2.log : void 0
@@ -176863,6 +176912,9 @@ const LogListGrid = ({
             }
           }
         }
+      }
+      if (preview?.thinking_truncation) {
+        row2.thinkingTruncation = preview.thinking_truncation;
       }
       row2.searchText = [row2.name, row2.task, row2.model, row2.id].filter(Boolean).join(" ").toLowerCase();
       return row2;
@@ -176938,6 +176990,47 @@ const LogListGrid = ({
     };
     loadHeaders();
   }, [logFiles, loadLogOverviews, setWatchedLogs, logPreviews]);
+  const api2 = useStore((state) => state.api);
+  const updateLogPreviews = useStore(
+    (state) => state.logsActions.updateLogPreviews
+  );
+  const enrichedFilesRef = reactExports.useRef(/* @__PURE__ */ new Set());
+  reactExports.useEffect(() => {
+    if (!api2?.get_log_truncation_counts) return;
+    const filesToEnrich = logFiles.filter((file) => {
+      const preview = logPreviews[file.name];
+      return preview && preview.status && preview.status !== "started" && !preview.thinking_truncation && !enrichedFilesRef.current.has(file.name);
+    });
+    if (filesToEnrich.length === 0) return;
+    for (const file of filesToEnrich) {
+      enrichedFilesRef.current.add(file.name);
+    }
+    const enrichTruncation = async () => {
+      try {
+        const counts = await api2.get_log_truncation_counts(
+          filesToEnrich.map((f) => f.name)
+        );
+        const updates = {};
+        for (const [fileName, truncation] of Object.entries(counts)) {
+          const existing = logPreviews[fileName];
+          if (existing && truncation.truncated_samples > 0) {
+            updates[fileName] = {
+              ...existing,
+              thinking_truncation: truncation
+            };
+          }
+        }
+        if (Object.keys(updates).length > 0) {
+          updateLogPreviews(updates);
+        }
+      } catch {
+        for (const file of filesToEnrich) {
+          enrichedFilesRef.current.delete(file.name);
+        }
+      }
+    };
+    enrichTruncation();
+  }, [logFiles, logPreviews, api2, updateLogPreviews]);
   const handleSortChanged = reactExports.useCallback(async () => {
     await loadAllLogOverviews();
     setWatchedLogs(logFiles);
@@ -176963,15 +177056,15 @@ const LogListGrid = ({
   }, [columns, resizeGridColumns]);
   const performSearch = reactExports.useCallback(
     (term) => {
-      const api2 = gridRef.current?.api;
-      if (!api2 || !term) {
+      const api22 = gridRef.current?.api;
+      if (!api22 || !term) {
         setMatchIds([]);
         setCurrentMatchIndex(0);
         return;
       }
       const lowerTerm = term.toLowerCase();
       const foundIds = [];
-      api2.forEachNode((node2) => {
+      api22.forEachNode((node2) => {
         const rowData = node2.data;
         if (!rowData?.searchText) return;
         if (rowData.searchText.includes(lowerTerm)) {
@@ -176981,10 +177074,10 @@ const LogListGrid = ({
       setMatchIds(foundIds);
       setCurrentMatchIndex(0);
       if (foundIds.length > 0) {
-        const firstNode = api2.getRowNode(foundIds[0]);
+        const firstNode = api22.getRowNode(foundIds[0]);
         if (firstNode) {
-          api2.deselectAll();
-          api2.ensureNodeVisible(firstNode, "middle");
+          api22.deselectAll();
+          api22.ensureNodeVisible(firstNode, "middle");
           firstNode.setSelected(true, true);
         }
       }
@@ -176996,12 +177089,12 @@ const LogListGrid = ({
       if (matchIds.length === 0) return;
       const idx = (index % matchIds.length + matchIds.length) % matchIds.length;
       setCurrentMatchIndex(idx);
-      const api2 = gridRef.current?.api;
-      if (!api2) return;
-      const node2 = api2.getRowNode(matchIds[idx]);
+      const api22 = gridRef.current?.api;
+      if (!api22) return;
+      const node2 = api22.getRowNode(matchIds[idx]);
       if (node2) {
-        api2.deselectAll();
-        api2.ensureNodeVisible(node2, "middle");
+        api22.deselectAll();
+        api22.ensureNodeVisible(node2, "middle");
         node2.setSelected(true, true);
       }
     },
@@ -193339,6 +193432,20 @@ const metadataViewsForSample = (id, scrollRef, sample2) => {
       ] }, `sample-invalidation-${id}`)
     );
   }
+  if (sample2.metadata?.thinking_truncated || detectTruncationFromEvents(sample2.events)) {
+    sampleMetadatas.push(
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          CardHeader,
+          {
+            icon: "bi bi-exclamation-triangle",
+            label: "Output Truncation"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardBody, { children: "This response hit max_tokens while the model was using reasoning tokens. Visible output may be incomplete because reasoning and output share the same token budget. Consider increasing max_tokens or setting reasoning.max_tokens to cap reasoning." })
+      ] }, `sample-truncation-${id}`)
+    );
+  }
   if (sample2.model_usage && Object.keys(sample2.model_usage).length > 0) {
     sampleMetadatas.push(
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
@@ -193444,8 +193551,8 @@ const printSample = (id, targetId, evalSpec) => {
       /* Additional control for long lines within code/preformatted blocks */
       pre {
           word-wrap: break-word; /* Break long words if needed */
-      }    
-          
+      }
+
       `;
       printHtml(
         [headingHtml, headingEl?.outerHTML, targetEl.innerHTML].join("\n"),
@@ -216093,6 +216200,17 @@ const SampleList = reactExports.memo((props) => {
       result2.push({
         type: "info",
         msg: `Skipped ${earlyStopping.early_stops.length} samples due to early stopping (${earlyStopping.manager}). `
+      });
+    }
+    const truncatedCount = items.reduce(
+      (prev, item2) => item2.data.metadata?.thinking_truncated ? prev + 1 : prev,
+      0
+    );
+    if (truncatedCount > 0) {
+      const percentTruncated = sampleCount > 0 ? truncatedCount / sampleCount * 100 : 0;
+      result2.push({
+        type: "warning",
+        msg: `WARNING: ${truncatedCount} of ${sampleCount} samples (${formatNoDecimal(percentTruncated)}%) hit max_tokens while using reasoning tokens. Visible output may be incomplete. Results may be unreliable.`
       });
     }
     return result2;

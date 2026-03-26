@@ -38,6 +38,7 @@ from inspect_ai._view.common import (
     get_logs,
     normalize_uri,
     parse_log_token,
+    scan_truncation_counts,
     stream_log_bytes,
 )
 from inspect_ai.log._file import read_eval_log_headers_async
@@ -343,6 +344,26 @@ def view_server_app(
             [await _map_file(request, file) for file in files]
         )
         return InspectJsonResponse(to_jsonable_python(headers, exclude_none=True))
+
+    @app.get("/log-truncation-counts")
+    async def api_log_truncation_counts(
+        request: Request, file: list[str] = Query([])
+    ) -> Response:
+        files = [normalize_uri(f) for f in file]
+        async with anyio.create_task_group() as tg:
+            for f in files:
+                tg.start_soon(_validate_read, request, f)
+        # Build original→mapped lookup so response keys match incoming URIs
+        mapped_pairs = [(f, await _map_file(request, f)) for f in files]
+        mapped_files = [m for _, m in mapped_pairs]
+        counts = await scan_truncation_counts(mapped_files)
+        # Re-key from mapped paths back to original URIs
+        result = {
+            orig: counts[mapped]
+            for orig, mapped in mapped_pairs
+            if mapped in counts
+        }
+        return InspectJsonResponse(result)
 
     @app.get("/events")
     async def api_events(

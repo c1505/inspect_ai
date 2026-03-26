@@ -27,6 +27,7 @@ import { ActivityBar } from "../../components/ActivityBar";
 import { Card, CardBody, CardHeader } from "../../components/Card";
 import { JSONPanel } from "../../components/JsonPanel";
 import { NoContentsPanel } from "../../components/NoContentsPanel";
+import { detectTruncationFromEvents } from "../../client/utils/type-utils";
 import {
   kSampleErrorTabId,
   kSampleJsonTabId,
@@ -584,6 +585,23 @@ const metadataViewsForSample = (
     );
   }
 
+  if (sample.metadata?.thinking_truncated || detectTruncationFromEvents(sample.events)) {
+    sampleMetadatas.push(
+      <Card key={`sample-truncation-${id}`}>
+        <CardHeader
+          icon="bi bi-exclamation-triangle"
+          label="Output Truncation"
+        />
+        <CardBody>
+          This response hit max_tokens while the model was using reasoning
+          tokens. Visible output may be incomplete because reasoning and output
+          share the same token budget. Consider increasing max_tokens or setting
+          reasoning.max_tokens to cap reasoning.
+        </CardBody>
+      </Card>,
+    );
+  }
+
   if (sample.model_usage && Object.keys(sample.model_usage).length > 0) {
     sampleMetadatas.push(
       <Card key={`sample-usage-${id}`}>
@@ -699,8 +717,8 @@ const printSample = (id: string, targetId: string, evalSpec?: EvalSpec) => {
       /* Additional control for long lines within code/preformatted blocks */
       pre {
           word-wrap: break-word; /* Break long words if needed */
-      }    
-          
+      }
+
       `;
       printHtml(
         [headingHtml, headingEl?.outerHTML, targetEl.innerHTML].join("\n"),

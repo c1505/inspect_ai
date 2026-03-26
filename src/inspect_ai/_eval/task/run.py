@@ -48,6 +48,7 @@ from inspect_ai._util.working import (
 from inspect_ai._view.notify import view_notify_eval
 from inspect_ai.dataset import Dataset, Sample
 from inspect_ai.event._error import ErrorEvent
+from inspect_ai.event._model import ModelEvent
 from inspect_ai.event._sample_init import SampleInitEvent
 from inspect_ai.event._sample_limit import SampleLimitEvent
 from inspect_ai.event._score import ScoreEvent
@@ -91,6 +92,8 @@ from inspect_ai.model._model import (
     init_sample_role_usage,
     sample_model_usage,
     sample_role_usage,
+    thinking_truncation_counts,
+    init_thinking_truncation_counts,
 )
 from inspect_ai.scorer import Scorer, Target
 from inspect_ai.scorer._metric import Metric, SampleScore
@@ -519,6 +522,31 @@ async def task_run(options: TaskRunOptions) -> EvalLog:
 
             # collect eval data
             collect_eval_data(stats)
+
+            # warn about output truncation on reasoning models
+            trunc_counts = thinking_truncation_counts()
+            if trunc_counts:
+                total_samples = profile.samples
+                for model_name, count in trunc_counts.items():
+                    pct = 100 * count / total_samples if total_samples else 0
+                    py_logger.warning(
+                        f"Output truncation: {model_name}: "
+                        f"{count}/{total_samples} samples ({pct:.0f}%) hit "
+                        f"max_tokens while using reasoning tokens. Visible "
+                        f"output may be incomplete. Consider increasing "
+                        f"max_tokens or setting reasoning.max_tokens."
+                    )
+
+                # store truncation info in results metadata for Inspect View
+                if results is not None:
+                    if results.metadata is None:
+                        results.metadata = {}
+                    total_truncated = sum(trunc_counts.values())
+                    results.metadata["thinking_truncation"] = {
+                        "truncated_samples": total_truncated,
+                        "total_samples": total_samples,
+                        "models": dict(trunc_counts),
+                    }
 
             sample_error_count = sum(result is None for result in sample_results)
             mark_log_as_error = _should_eval_fail(
@@ -1284,13 +1312,27 @@ def create_eval_sample(
     # compute total time if we can
     total_time = time.monotonic() - start_time if start_time is not None else None
 
+    # flag samples where output was truncated on a reasoning model:
+    # any generate() call that returned stop_reason=max_tokens while
+    # reasoning_tokens > 0 indicates the shared budget was exhausted
+    metadata = dict(state.metadata) if state.metadata else {}
+    output_truncated_with_reasoning = any(
+        isinstance(e, ModelEvent)
+        and e.output.stop_reason == "max_tokens"
+        and e.output.usage is not None
+        and (e.output.usage.reasoning_tokens or 0) > 0
+        for e in transcript().events
+    )
+    if output_truncated_with_reasoning:
+        metadata["thinking_truncated"] = True
+
     return EvalSample(
         id=id,
         epoch=state.epoch,
         input=sample.input,
         choices=sample.choices,
         target=sample.target,
-        metadata=state.metadata or {},
+        metadata=metadata,
         sandbox=sample.sandbox,
         files=list(sample.files.keys()) if sample.files else None,
         setup=sample.setup,

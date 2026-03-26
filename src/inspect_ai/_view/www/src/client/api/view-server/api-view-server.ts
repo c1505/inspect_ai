@@ -1,12 +1,11 @@
-import { Scores } from "../../../@types/log";
 import { asyncJsonParse } from "../../../utils/json-worker";
 import { download_file } from "../shared/api-shared";
+import { toLogPreview } from "../../utils/type-utils";
 import {
   Capabilities,
   EvalHeader,
   LogContents,
   LogInfo,
-  LogPreview,
   LogViewAPI,
   PendingSampleResponse,
   PendingSamples,
@@ -170,33 +169,6 @@ export function viewServerApi(
     return result.parsed;
   };
 
-  const toLogPreview = (header: EvalHeader): LogPreview => {
-    const scores: Scores = Object.values(header.results?.scores || {});
-    const metric = scores.length > 0 ? scores[0].metrics : undefined;
-    const evalMetrics = Object.values(metric || {});
-    const primary_metric = evalMetrics.length > 0 ? evalMetrics[0] : undefined;
-
-    return {
-      eval_id: header.eval.eval_id,
-      run_id: header.eval.run_id,
-
-      task: header.eval.task,
-      task_id: header.eval.task_id,
-      task_version: header.eval.task_version,
-
-      version: header.version,
-      status: header.status,
-      error: header.error,
-
-      model: header.eval.model,
-
-      started_at: header.stats?.started_at,
-      completed_at: header.stats?.completed_at,
-
-      primary_metric,
-    };
-  };
-
   const get_log_bytes = async (
     file: string,
     start: number,
@@ -353,6 +325,22 @@ export function viewServerApi(
     document.body.removeChild(link);
   };
 
+  const get_log_truncation_counts = async (
+    files: string[],
+  ): Promise<
+    Record<string, { truncated_samples: number; total_samples: number }>
+  > => {
+    const params = new URLSearchParams();
+    for (const file of files) {
+      params.append("file", file);
+    }
+    const result = await requestApi.fetchString(
+      "GET",
+      `/log-truncation-counts?${params.toString()}`,
+    );
+    return result.parsed;
+  };
+
   return {
     client_events,
     get_log_root,
@@ -370,5 +358,6 @@ export function viewServerApi(
     open_log_file: async () => {},
     eval_pending_samples,
     eval_log_sample_data,
+    get_log_truncation_counts,
   };
 }

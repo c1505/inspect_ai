@@ -16669,51 +16669,55 @@ button._segment_mhb7y_9 {
   width: inherit;
   height: inherit;
 }
-._nameCell_1jtud_1 {
+._nameCell_14kld_1 {
   display: flex;
   align-items: center;
   min-width: 0;
   flex: 1;
 }
 
-._modelCell_1jtud_8 {
+._modelCell_14kld_8 {
   display: flex;
   align-items: center;
   min-width: 0;
   flex: 1;
 }
 
-._scoreCell_1jtud_15 {
+._scoreCell_14kld_15 {
   display: flex;
   align-items: center;
   font-size: 0.875rem;
   color: var(--bs-gray-600);
 }
 
-._error_1jtud_22 {
+._error_14kld_22 {
   color: var(--bs-danger);
 }
 
-._started_1jtud_26 {
+._started_14kld_26 {
   color: var(--bs-secondary);
 }
 
-._success_1jtud_30 {
+._success_14kld_30 {
   color: var(--bs-success);
 }
 
-._cancelled_1jtud_34 {
+._cancelled_14kld_34 {
   color: var(--bs-secondary);
 }
 
-._statusCell_1jtud_38 {
+._warning_14kld_38 {
+  color: var(--bs-warning);
+}
+
+._statusCell_14kld_42 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
 }
 
-._dateCell_1jtud_45 {
+._dateCell_14kld_49 {
   display: flex;
   align-items: center;
   min-width: 0;

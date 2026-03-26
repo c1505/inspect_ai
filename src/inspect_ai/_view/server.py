@@ -40,6 +40,7 @@ from .common import (
     get_logs,
     normalize_uri,
     parse_log_token,
+    scan_truncation_counts,
     stream_log_bytes,
 )
 from .notify import view_last_eval_time
@@ -302,6 +303,14 @@ def view_server(
         files = [normalize_uri(file) for file in files]
         map(validate_log_file_request, files)
         return await log_headers_response(files)
+
+    @routes.get("/api/log-truncation-counts")
+    async def api_log_truncation_counts(request: web.Request) -> web.Response:
+        files = request.query.getall("file", [])
+        files = [normalize_uri(file) for file in files]
+        map(validate_log_file_request, files)
+        counts = await scan_truncation_counts(files)
+        return web.json_response(counts)
 
     @routes.get("/api/events")
     async def api_events(request: web.Request) -> web.Response:

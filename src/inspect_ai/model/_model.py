@@ -1026,6 +1026,26 @@ class Model:
             if output.usage:
                 record_and_check_model_usage(f"{self}", output.usage, role=self.role)
 
+                # warn if output was truncated on a reasoning model —
+                # stop_reason=max_tokens is the truncation signal;
+                # reasoning_tokens > 0 narrows to models where the
+                # shared budget is the likely cause
+                if (
+                    output.stop_reason == "max_tokens"
+                    and output.usage.reasoning_tokens
+                    and output.usage.reasoning_tokens > 0
+                ):
+                    record_thinking_truncation(f"{self}")
+                    warn_once(
+                        logger,
+                        f"Output truncated: {self} hit max_tokens while "
+                        f"using reasoning tokens. The model's visible "
+                        f"output may be incomplete because reasoning and "
+                        f"output share the same token budget. Consider "
+                        f"increasing max_tokens or setting "
+                        f"reasoning.max_tokens to cap reasoning.",
+                    )
+
                 # send telemetry to hooks
                 await emit_model_usage(
                     model_name=str(self), usage=output.usage, call_duration=output.time
@@ -1912,6 +1932,48 @@ def init_model_usage(initial_usage: dict[str, ModelUsage] | None = None) -> None
 
 def init_sample_model_usage() -> None:
     sample_model_usage_context_var.set({})
+    # Reset per-sample "already counted" flag. Uses a mutable list so the
+    # flag survives async task boundaries (child .set() on immutable values
+    # is invisible to the parent, but mutations to a shared list propagate).
+    # NOTE: This flag is only used for the eval-wide truncation counter
+    # (prevent double-counting). Per-sample metadata is derived separately
+    # from transcript ModelEvents in create_eval_sample().
+    sample_thinking_truncation_var.set([False])
+
+
+def record_thinking_truncation(model: str) -> None:
+    """Record that output truncation occurred on a reasoning model in this sample.
+
+    Increments the eval-wide per-model counter (once per sample).
+    Per-sample metadata is NOT set here — it is derived from transcript
+    events in create_eval_sample() to avoid ContextVar boundary issues.
+    """
+    flag = sample_thinking_truncation_var.get([False])
+    if not flag[0]:
+        counts = thinking_truncation_counts_var.get({})
+        counts[model] = counts.get(model, 0) + 1
+    flag[0] = True
+
+
+def thinking_truncation_counts() -> dict[str, int]:
+    """Get per-model counts of output truncations on reasoning models."""
+    return thinking_truncation_counts_var.get({})
+
+
+def init_thinking_truncation_counts() -> None:
+    thinking_truncation_counts_var.set({})
+
+
+# Per-sample flag: "has this sample already been counted in the eval-wide counter?"
+# Mutable list so mutations propagate across async task boundaries.
+sample_thinking_truncation_var: ContextVar[list[bool]] = ContextVar(
+    "sample_thinking_truncation", default=[False]
+)
+
+# Eval-wide counter: model_name → number of samples with truncation
+thinking_truncation_counts_var: ContextVar[dict[str, int]] = ContextVar(
+    "thinking_truncation_counts", default={}
+)
 
 
 def init_role_usage(initial_usage: dict[str, ModelUsage] | None = None) -> None:

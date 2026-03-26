@@ -426,6 +426,12 @@ export const clientApi = (
     get_log_sample_data: api.eval_log_sample_data
       ? middleware("get_log_sample_data", get_log_sample_data)
       : undefined,
+    get_log_truncation_counts: api.get_log_truncation_counts
+      ? middleware(
+          "get_log_truncation_counts",
+          (files: string[]) => api.get_log_truncation_counts!(files),
+        )
+      : undefined,
   };
 };
 
