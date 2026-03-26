@@ -13,6 +13,10 @@ export interface LogListRow {
   completedAt?: string;
   itemCount?: number;
   log?: LogHandle;
+  thinkingTruncation?: {
+    truncated_samples: number;
+    total_samples: number;
+  };
   searchText?: string; // Pre-computed searchable text for fast Cmd+F search
   [key: string]: any; // For dynamic score columns
 }

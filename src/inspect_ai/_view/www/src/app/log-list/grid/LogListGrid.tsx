@@ -252,6 +252,70 @@ export const LogListGrid: FC<LogListGridProps> = ({
     loadHeaders();
   }, [logFiles, loadLogOverviews, setWatchedLogs, logPreviews]);
 
+  // Two-phase enrichment: after previews load, fetch truncation counts
+  // for old logs that lack precomputed thinking_truncation metadata.
+  const api = useStore((state) => state.api);
+  const updateLogPreviews = useStore(
+    (state) => state.logsActions.updateLogPreviews,
+  );
+  const enrichedFilesRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!api?.get_log_truncation_counts) return;
+
+    const filesToEnrich = logFiles.filter((file) => {
+      const preview = logPreviews[file.name];
+      // Only enrich logs that have a loaded preview, a completed status,
+      // and no existing truncation data, and haven't been requested yet.
+      return (
+        preview &&
+        preview.status &&
+        preview.status !== "started" &&
+        !preview.thinking_truncation &&
+        !enrichedFilesRef.current.has(file.name)
+      );
+    });
+
+    if (filesToEnrich.length === 0) return;
+
+    // Mark as requested immediately to prevent duplicate calls
+    for (const file of filesToEnrich) {
+      enrichedFilesRef.current.add(file.name);
+    }
+
+    const enrichTruncation = async () => {
+      try {
+        const counts = await api.get_log_truncation_counts!(
+          filesToEnrich.map((f) => f.name),
+        );
+
+        // Merge truncation counts into existing previews
+        const updates: Record<string, typeof logPreviews[string]> = {};
+        for (const [fileName, truncation] of Object.entries(counts)) {
+          const existing = logPreviews[fileName];
+          if (existing && truncation.truncated_samples > 0) {
+            updates[fileName] = {
+              ...existing,
+              thinking_truncation: truncation,
+            };
+          }
+        }
+
+        if (Object.keys(updates).length > 0) {
+          updateLogPreviews(updates);
+        }
+      } catch {
+        // Enrichment is best-effort; don't block the UI on failure.
+        // Clear the tracking so a retry can happen on next render.
+        for (const file of filesToEnrich) {
+          enrichedFilesRef.current.delete(file.name);
+        }
+      }
+    };
+
+    enrichTruncation();
+  }, [logFiles, logPreviews, api, updateLogPreviews]);
+
   const handleSortChanged = useCallback(async () => {
     await loadAllLogOverviews();
     setWatchedLogs(logFiles);

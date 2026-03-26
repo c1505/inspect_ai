@@ -34,6 +34,58 @@ from inspect_ai.log._file import (
 logger = getLogger(__name__)
 
 
+async def scan_truncation_counts(
+    files: list[str],
+) -> dict[str, dict[str, int]]:
+    """Scan eval logs for reasoning-model output truncation.
+
+    Reads sample data to detect stop_reason=max_tokens with
+    reasoning_tokens > 0.  Only called for logs that lack
+    precomputed thinking_truncation metadata.
+
+    Returns a dict keyed by file path with
+    {truncated_samples, total_samples} for each file.
+    """
+    from inspect_ai.event._model import ModelEvent
+
+    results: dict[str, dict[str, int]] = {}
+
+    for file in files:
+        try:
+            log = await read_eval_log_async(file, header_only=False)
+        except Exception:
+            logger.debug(f"Could not read log for truncation scan: {file}")
+            continue
+
+        if not log.samples:
+            continue
+
+        truncated = 0
+        for sample in log.samples:
+            for event in sample.events:
+                if not isinstance(event, ModelEvent):
+                    continue
+                output = event.output
+                if output is None:
+                    continue
+                choices = output.choices or []
+                if not choices:
+                    continue
+                if choices[0].stop_reason != "max_tokens":
+                    continue
+                usage = output.usage
+                if usage and usage.reasoning_tokens and usage.reasoning_tokens > 0:
+                    truncated += 1
+                    break  # one truncated event is enough per sample
+
+        results[file] = {
+            "truncated_samples": truncated,
+            "total_samples": len(log.samples),
+        }
+
+    return results
+
+
 def normalize_uri(uri: str) -> str:
     """Normalize incoming URIs to a consistent format."""
     # Decode any URL-encoded characters

@@ -28108,6 +28108,26 @@ const primaryMetric = (evalResults) => {
   }
   return void 0;
 };
+const detectTruncationFromEvents = (events) => {
+  if (!events || events.length === 0) return false;
+  for (const event of events) {
+    if (isModelEvent$1(event) && isOutputTruncated(event)) {
+      return true;
+    }
+  }
+  return false;
+};
+const isModelEvent$1 = (event) => {
+  return "event" in event && event.event === "model";
+};
+const isOutputTruncated = (event) => {
+  const output2 = event.output;
+  if (!output2) return false;
+  const stopReason = output2.choices?.[0]?.stop_reason;
+  if (stopReason !== "max_tokens") return false;
+  const reasoning2 = output2.usage?.reasoning_tokens;
+  return typeof reasoning2 === "number" && reasoning2 > 0;
+};
 const directoryRelativeUrl = (file, dir) => {
   if (!dir) {
     return uriEncodePathSegments(file);
@@ -110476,7 +110496,11 @@ const clientApi = (api2, log_file, debug2 = false) => {
       }
     ),
     get_log_pending_samples: api2.eval_pending_samples ? middleware("get_log_pending_samples", get_log_pending_samples) : void 0,
-    get_log_sample_data: api2.eval_log_sample_data ? middleware("get_log_sample_data", get_log_sample_data) : void 0
+    get_log_sample_data: api2.eval_log_sample_data ? middleware("get_log_sample_data", get_log_sample_data) : void 0,
+    get_log_truncation_counts: api2.get_log_truncation_counts ? middleware(
+      "get_log_truncation_counts",
+      (files) => api2.get_log_truncation_counts(files)
+    ) : void 0
   };
 };
 const debugMiddleware = (name2, _fn, args2, result2) => {
@@ -110992,37 +111016,6 @@ function viewServerApi(options2 = {}) {
     );
     return result2.parsed;
   };
-  const toLogPreview2 = (header2) => {
-    const scores2 = Object.values(header2.results?.scores || {});
-    const metric = scores2.length > 0 ? scores2[0].metrics : void 0;
-    const evalMetrics = Object.values(metric || {});
-    const primary_metric = evalMetrics.length > 0 ? evalMetrics[0] : void 0;
-    return {
-      eval_id: header2.eval.eval_id,
-      run_id: header2.eval.run_id,
-      task: header2.eval.task,
-      task_id: header2.eval.task_id,
-      task_version: header2.eval.task_version,
-      version: header2.version,
-      status: header2.status,
-      error: header2.error,
-      model: header2.eval.model,
-      started_at: header2.stats?.started_at,
-      completed_at: header2.stats?.completed_at,
-      primary_metric,
-      thinking_truncation: (() => {
-        const meta2 = header2.results?.metadata;
-        const trunc = meta2?.thinking_truncation;
-        if (trunc && typeof trunc.truncated_samples === "number" && trunc.truncated_samples > 0) {
-          return {
-            truncated_samples: trunc.truncated_samples,
-            total_samples: trunc.total_samples ?? 0
-          };
-        }
-        return void 0;
-      })()
-    };
-  };
   const get_log_bytes2 = async (file, start2, end2) => requestApi.fetchBytes(
     "GET",
     `/log-bytes/${encodeURIComponent(file)}?start=${start2}&end=${end2}`
@@ -111037,7 +111030,7 @@ function viewServerApi(options2 = {}) {
       `/log-headers?${params.toString()}`
     );
     const logHeaders = result2.parsed;
-    return logHeaders.map(toLogPreview2);
+    return logHeaders.map(toLogPreview);
   };
   const log_message2 = async (log_file, message2) => {
     const params = new URLSearchParams();
@@ -111146,6 +111139,17 @@ function viewServerApi(options2 = {}) {
     link2.click();
     document.body.removeChild(link2);
   };
+  const get_log_truncation_counts = async (files) => {
+    const params = new URLSearchParams();
+    for (const file of files) {
+      params.append("file", file);
+    }
+    const result2 = await requestApi.fetchString(
+      "GET",
+      `/log-truncation-counts?${params.toString()}`
+    );
+    return result2.parsed;
+  };
   return {
     client_events: client_events2,
     get_log_root: get_log_root2,
@@ -111163,7 +111167,8 @@ function viewServerApi(options2 = {}) {
     open_log_file: async () => {
     },
     eval_pending_samples: eval_pending_samples2,
-    eval_log_sample_data: eval_log_sample_data2
+    eval_log_sample_data: eval_log_sample_data2,
+    get_log_truncation_counts
   };
 }
 const kMethodEvalLogDir = "eval_log_dir";
@@ -118923,7 +118928,7 @@ const ViewerOptionsPopover = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.fullWidth, styles$1d.fullWidthPadded), children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: styles$1d.logDir, children: logDir2 }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Version" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-12-g22b88be98" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: "0.3.200-13-g1b69ace2e" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx("text-style-label", "text-style-secondary"), children: "Schema" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(), children: DB_VERSION }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: clsx(styles$1d.spacer) }),
@@ -176985,6 +176990,47 @@ const LogListGrid = ({
     };
     loadHeaders();
   }, [logFiles, loadLogOverviews, setWatchedLogs, logPreviews]);
+  const api2 = useStore((state) => state.api);
+  const updateLogPreviews = useStore(
+    (state) => state.logsActions.updateLogPreviews
+  );
+  const enrichedFilesRef = reactExports.useRef(/* @__PURE__ */ new Set());
+  reactExports.useEffect(() => {
+    if (!api2?.get_log_truncation_counts) return;
+    const filesToEnrich = logFiles.filter((file) => {
+      const preview = logPreviews[file.name];
+      return preview && preview.status && preview.status !== "started" && !preview.thinking_truncation && !enrichedFilesRef.current.has(file.name);
+    });
+    if (filesToEnrich.length === 0) return;
+    for (const file of filesToEnrich) {
+      enrichedFilesRef.current.add(file.name);
+    }
+    const enrichTruncation = async () => {
+      try {
+        const counts = await api2.get_log_truncation_counts(
+          filesToEnrich.map((f) => f.name)
+        );
+        const updates = {};
+        for (const [fileName, truncation] of Object.entries(counts)) {
+          const existing = logPreviews[fileName];
+          if (existing && truncation.truncated_samples > 0) {
+            updates[fileName] = {
+              ...existing,
+              thinking_truncation: truncation
+            };
+          }
+        }
+        if (Object.keys(updates).length > 0) {
+          updateLogPreviews(updates);
+        }
+      } catch {
+        for (const file of filesToEnrich) {
+          enrichedFilesRef.current.delete(file.name);
+        }
+      }
+    };
+    enrichTruncation();
+  }, [logFiles, logPreviews, api2, updateLogPreviews]);
   const handleSortChanged = reactExports.useCallback(async () => {
     await loadAllLogOverviews();
     setWatchedLogs(logFiles);
@@ -177010,15 +177056,15 @@ const LogListGrid = ({
   }, [columns, resizeGridColumns]);
   const performSearch = reactExports.useCallback(
     (term) => {
-      const api2 = gridRef.current?.api;
-      if (!api2 || !term) {
+      const api22 = gridRef.current?.api;
+      if (!api22 || !term) {
         setMatchIds([]);
         setCurrentMatchIndex(0);
         return;
       }
       const lowerTerm = term.toLowerCase();
       const foundIds = [];
-      api2.forEachNode((node2) => {
+      api22.forEachNode((node2) => {
         const rowData = node2.data;
         if (!rowData?.searchText) return;
         if (rowData.searchText.includes(lowerTerm)) {
@@ -177028,10 +177074,10 @@ const LogListGrid = ({
       setMatchIds(foundIds);
       setCurrentMatchIndex(0);
       if (foundIds.length > 0) {
-        const firstNode = api2.getRowNode(foundIds[0]);
+        const firstNode = api22.getRowNode(foundIds[0]);
         if (firstNode) {
-          api2.deselectAll();
-          api2.ensureNodeVisible(firstNode, "middle");
+          api22.deselectAll();
+          api22.ensureNodeVisible(firstNode, "middle");
           firstNode.setSelected(true, true);
         }
       }
@@ -177043,12 +177089,12 @@ const LogListGrid = ({
       if (matchIds.length === 0) return;
       const idx = (index % matchIds.length + matchIds.length) % matchIds.length;
       setCurrentMatchIndex(idx);
-      const api2 = gridRef.current?.api;
-      if (!api2) return;
-      const node2 = api2.getRowNode(matchIds[idx]);
+      const api22 = gridRef.current?.api;
+      if (!api22) return;
+      const node2 = api22.getRowNode(matchIds[idx]);
       if (node2) {
-        api2.deselectAll();
-        api2.ensureNodeVisible(node2, "middle");
+        api22.deselectAll();
+        api22.ensureNodeVisible(node2, "middle");
         node2.setSelected(true, true);
       }
     },
@@ -193386,7 +193432,7 @@ const metadataViewsForSample = (id, scrollRef, sample2) => {
       ] }, `sample-invalidation-${id}`)
     );
   }
-  if (sample2.metadata?.thinking_truncated) {
+  if (sample2.metadata?.thinking_truncated || detectTruncationFromEvents(sample2.events)) {
     sampleMetadatas.push(
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -193505,8 +193551,8 @@ const printSample = (id, targetId, evalSpec) => {
       /* Additional control for long lines within code/preformatted blocks */
       pre {
           word-wrap: break-word; /* Break long words if needed */
-      }    
-          
+      }
+
       `;
       printHtml(
         [headingHtml, headingEl?.outerHTML, targetEl.innerHTML].join("\n"),

@@ -200,6 +200,11 @@ export interface LogViewAPI {
     last_event?: number,
     last_attachment?: number,
   ) => Promise<SampleDataResponse | undefined>;
+  get_log_truncation_counts?: (
+    files: string[],
+  ) => Promise<
+    Record<string, { truncated_samples: number; total_samples: number }>
+  >;
 }
 
 export interface ClientAPI {
@@ -259,6 +264,13 @@ export interface ClientAPI {
   ) => Promise<void>;
   download_log?: (log_file: string) => Promise<void>;
   open_log_file: (log_file: string, log_dir: string) => Promise<void>;
+
+  // Truncation enrichment for old logs
+  get_log_truncation_counts?: (
+    files: string[],
+  ) => Promise<
+    Record<string, { truncated_samples: number; total_samples: number }>
+  >;
 }
 
 export interface ClientStorage {
